@@ -9,13 +9,19 @@ import AddProduct from "../pages/AddProduct"
 import ProductsListe from "../pages/products"
 import HomePage from "../pages/home"
 import ProductDetailsPage from "../pages/SinglePage"
+import Cart from "../pages/Carte"
+import AllProducts from "../pages/admin/AllProducts"
 export const router = createBrowserRouter([
   {
     element : <Layout/>,
     children:[
       {
-        path : 'product/:id',
+        path : 'AllProducts/product/:id',
         element : <ProductDetailsPage/>
+      },
+      {
+        path : 'Cart',
+        element : <Cart/>
       },
       {
         path : '/',
@@ -40,6 +46,10 @@ export const router = createBrowserRouter([
       {
         path : '*',
         element : <Notfound/>
+      },
+      {
+        path : '/admin/AllProducts',
+        element : <AllProducts/>
       }
     ]
   }

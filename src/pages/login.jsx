@@ -40,7 +40,7 @@ export default function Login() {
         className="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden"
       >
         {/* Auth Header */}
-        <div className="bg-indigo-600 py-6 px-8 text-center">
+        <div className="bg-black py-6 px-8 text-center">
           <h2 className={`${fontClasses.heading} text-3xl text-white`}>
             {isLogin ? 'Welcome Back' : 'Join StyleHaven'}
           </h2>
@@ -148,7 +148,7 @@ export default function Login() {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               type="submit"
-              className={`${fontClasses.subheading} w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 px-4 rounded-lg flex items-center justify-center transition-colors duration-300`}
+              className={`${fontClasses.subheading} w-full bg-black hover:bg-indigo-700 text-white py-3 px-4 rounded-lg flex items-center justify-center transition-colors duration-300`}
             >
               {isLogin ? 'Sign In' : 'Create Account'}
               <FiArrowRight className="ml-2" />
@@ -182,13 +182,13 @@ export default function Login() {
             <p className={`${fontClasses.body} text-center text-gray-500 text-sm mb-3`}>
               Or continue with
             </p>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-3 gap-3 ">
               {['Google', 'Facebook', 'Twitter'].map((provider) => (
                 <motion.button
                   key={provider}
                   whileHover={{ y: -2 }}
                   whileTap={{ scale: 0.95 }}
-                  className={`${fontClasses.body} w-full py-2 px-4 border border-gray-300 rounded-md text-sm font-medium text-gray-700 flex items-center justify-center`}
+                  className={`${fontClasses.body} hover:shadow-lg w-full py-2 px-4 border border-gray-300 rounded-md text-sm font-medium text-gray-700 flex items-center justify-center`}
                 >
                   <img 
                     src={`https://logo.clearbit.com/${provider.toLowerCase()}.com`} 

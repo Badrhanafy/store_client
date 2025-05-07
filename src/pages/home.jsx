@@ -104,9 +104,9 @@ const HomePage = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              { name: "Men's Fashion", image: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1936&q=80" },
-              { name: "Women's Wear", image: "https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1887&q=80" },
-              { name: "Accessories", image: "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1938&q=80" }
+              { name: "9obiyat", image: "clothes/90biya.jpg" },
+              { name: "chapeau", image: "clothes/caskette.jpeg" },
+              { name: "tshirts", image: "clothes/thirt2.jpg" }
             ].map((category, index) => (
               <div key={index} className="group relative overflow-hidden rounded-lg shadow-lg">
                 <img 

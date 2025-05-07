@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { FiShoppingBag, FiHeart, FiChevronRight,FiStar, FiCheck, FiCreditCard, FiTruck } from 'react-icons/fi';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useParams, Link } from 'react-router-dom';
+import { FiShoppingBag, FiHeart, FiStar, FiChevronRight, FiCheck, FiPlus, FiMinus, FiCreditCard, FiTruck, FiImage } from 'react-icons/fi';
+import { motion, AnimatePresence } from 'framer-motion';
 
-// Consistent with your store's font classes
 const fontClasses = {
   heading: "font-['Playfair_Display'] font-bold",
   subheading: "font-['Montserrat'] font-medium",
@@ -10,107 +11,167 @@ const fontClasses = {
   nav: "font-['Raleway'] font-medium"
 };
 
-const ProductDetailsPage = () => {
-  const [selectedSize, setSelectedSize] = useState('');
-  const [quantity, setQuantity] = useState(1);
+export default function ProductDetails() {
+  const { id } = useParams();
+  const [product, setProduct] = useState(null);
+  const [productImages, setProductImages] = useState([]);
   const [phone, setPhone] = useState('');
+  const [customer_name, setname] = useState('');
   const [address, setAddress] = useState('');
+  const [taille, setTaille] = useState('M');
+  const [quantity, setQuantity] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState('cash');
   const [isWishlist, setIsWishlist] = useState(false);
   const [activeImage, setActiveImage] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [orderSuccess, setOrderSuccess] = useState(false);
+  const [direction, setDirection] = useState(0); // For slide animation direction
 
-  // Sample product data - replace with your actual data
-  const product = {
-    id: 1,
-    title: "Premium Cotton T-Shirt",
-    description: "Crafted from 100% organic cotton for ultimate comfort. This slim-fit t-shirt features reinforced stitching and a premium finish that lasts wash after wash.",
-    price: 199.99,
-    qte: 50,
-    colors: ["#3B82F6", "#EF4444", "#10B981"], // blue, red, green
-    sizes: ["S", "M", "L", "XL"],
-    images: [
-      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1480&q=80",
-      "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1480&q=80",
-      "https://images.unsplash.com/photo-1576566588028-4147f3842f27?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1480&q=80"
-    ],
-    rating: 4.5,
-    reviews: 128
-  };
-
-  const handleSubmitOrder = (e) => {
-    e.preventDefault();
-    // Handle order submission
-    console.log({
-      productId: product.id,
-      size: selectedSize,
-      quantity,
-      phone,
-      address,
-      paymentMethod
+  useEffect(() => {
+    setIsLoading(true);
+    Promise.all([
+      axios.get(`http://localhost:8000/api/products/${id}`),
+      axios.get(`http://localhost:8000/api/products/${id}/images`)
+    ])
+    .then(([productResponse, imagesResponse]) => {
+      setProduct(productResponse.data);
+      const allImages = [
+        { id: 0, image_path: productResponse.data.image, is_main: true },
+        ...imagesResponse.data.images
+      ];
+      setProductImages(allImages);
+      setIsLoading(false);
+    })
+    .catch(error => {
+      console.error('Error fetching data:', error);
+      setIsLoading(false);
     });
-    alert("Your order has been placed successfully!");
+  }, [id]);
+
+  const handleImageChange = (newIndex) => {
+    setDirection(newIndex > activeImage ? 1 : -1);
+    setActiveImage(newIndex);
   };
+
+  const returnToMainImage = () => {
+    setDirection(-1);
+    setActiveImage(0);
+  };
+
+  const placeOrder = async (e) => {
+    e.preventDefault();
+    try {
+      const orderData = {
+        product_id: product.id,
+        quantity,
+        phone,
+        address,
+        taille,
+        customer_name,
+        payment_method: paymentMethod
+      };
+
+      await axios.post('http://localhost:8000/api/orders', orderData);
+      setOrderSuccess(true);
+      setTimeout(() => setOrderSuccess(false), 3000);
+    } catch (error) {
+      console.error('Error placing order:', error);
+      alert('Error placing order');
+    }
+  };
+
+  if (isLoading) return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
+    </div>
+  );
+
+  if (!product) return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <p className={`${fontClasses.body} text-gray-700`}>Product not found</p>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        {/* Breadcrumb */}
         <div className={`${fontClasses.body} flex items-center text-sm text-gray-600 mb-6`}>
-          <span>Home</span>
-          <FiChevronRight className="mx-2" />
-          <span>Men</span>
-          <FiChevronRight className="mx-2" />
-          <span className="text-gray-900 font-medium">T-Shirts</span>
+          <span className="hover:text-indigo-600 cursor-pointer">Home</span>
+          <FiChevronRight className="mx-2 text-gray-400" />
+          <span className="hover:text-indigo-600 cursor-pointer"><Link to={"/AllProducts"}>Products</Link></span>
+          <FiChevronRight className="mx-2 text-gray-400" />
+          <span className="text-gray-900 font-medium">{product.title}</span>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Product Images */}
           <div>
-            <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-4">
-              <img 
-                src={product.images[activeImage]} 
-                alt={product.title}
-                className="w-full h-96 object-cover"
-              />
-            </div>
-            <div className="grid grid-cols-3 gap-3">
-              {product.images.map((img, index) => (
+            {/* Main Image with Animation */}
+            <div className="bg-white rounded-xl shadow-sm overflow-hidden mb-4 relative h-96">
+              <AnimatePresence custom={direction}>
                 <motion.div
-                  key={index}
-                  whileHover={{ scale: 1.03 }}
-                  className={`cursor-pointer rounded-lg overflow-hidden border-2 ${activeImage === index ? 'border-indigo-600' : 'border-transparent'}`}
-                  onClick={() => setActiveImage(index)}
+                  key={activeImage}
+                  custom={direction}
+                  initial={{ opacity: 0, x: direction > 0 ? 100 : -100 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: direction > 0 ? -100 : 100 }}
+                  transition={{ duration: 0.3 }}
+                  className="absolute inset-0"
                 >
                   <img 
-                    src={img} 
-                    alt={`${product.title} view ${index + 1}`}
-                    className="w-full h-24 object-cover"
+                    src={`http://localhost:8000/${productImages[activeImage]?.image_path || product.image}`}
+                    alt={product.title}
+                    className="w-full h-full object-contain"
                   />
                 </motion.div>
-              ))}
+              </AnimatePresence>
+              
+              {/* Return to Main Image Button */}
+              {activeImage !== 0 && (
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={returnToMainImage}
+                  className="absolute top-4 right-4 bg-white/80 backdrop-blur-sm rounded-full p-2 shadow-md z-10"
+                  title="Return to main image"
+                >
+                  <FiImage className="text-indigo-600" />
+                </motion.button>
+              )}
             </div>
+
+            {/* Thumbnail Images */}
+            {productImages.length > 1 && (
+              <div className="grid grid-cols-4 gap-3">
+                {productImages.map((image, index) => (
+                  <motion.div
+                    key={image.id}
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.98 }}
+                    className={`cursor-pointer rounded-lg overflow-hidden border-2 ${
+                      activeImage === index 
+                        ? 'border-indigo-600 ring-2 ring-indigo-300' 
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                    onClick={() => handleImageChange(index)}
+                  >
+                    <img 
+                      src={`http://localhost:8000/${image.image_path}`}
+                      alt={`${product.title} thumbnail ${index + 1}`}
+                      className="w-full h-24 object-cover"
+                    />
+                  </motion.div>
+                ))}
+              </div>
+            )}
+            
           </div>
 
-          {/* Product Details */}
-          <div>
+             {/* Product Details */}
+             <div>
             <div className="bg-white rounded-xl shadow-sm p-6">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h1 className={`${fontClasses.heading} text-3xl text-gray-900 mb-2`}>{product.title}</h1>
-                  <div className="flex items-center mb-4">
-                    <div className="flex">
-                      {[...Array(5)].map((_, i) => (
-                        <FiStar 
-                          key={i} 
-                          className={`${i < Math.floor(product.rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`} 
-                        />
-                      ))}
-                    </div>
-                    <span className={`${fontClasses.body} text-gray-600 ml-2`}>
-                      {product.rating} ({product.reviews} reviews)
-                    </span>
-                  </div>
-                </div>
+              <div className="flex justify-between items-start mb-4">
+                <h1 className={`${fontClasses.heading} text-3xl text-gray-900`}>{product.title}</h1>
                 <button 
                   onClick={() => setIsWishlist(!isWishlist)}
                   className="p-2 rounded-full hover:bg-gray-100"
@@ -121,30 +182,35 @@ const ProductDetailsPage = () => {
 
               <p className={`${fontClasses.body} text-gray-700 mb-6`}>{product.description}</p>
 
-              <div className="mb-6">
-                <h3 className={`${fontClasses.subheading} text-lg text-gray-900 mb-3`}>Available Colors</h3>
-                <div className="flex space-x-3">
-                  {product.colors.map((color, index) => (
-                    <div 
-                      key={index}
-                      className="w-10 h-10 rounded-full border-2 border-gray-200 cursor-pointer"
-                      style={{ backgroundColor: color }}
-                      title={`Color option ${index + 1}`}
+              <div className="flex items-center mb-6">
+                <div className="flex">
+                  {[...Array(5)].map((_, i) => (
+                    <FiStar 
+                      key={i} 
+                      className={`${i < 4 ? 'text-yellow-400 fill-current' : 'text-gray-300'}`} 
                     />
                   ))}
                 </div>
+                <span className={`${fontClasses.body} text-gray-600 ml-2`}>
+                  (128 reviews)
+                </span>
               </div>
 
-              <div className="mb-8">
+              <div className="mb-6">
+                <h3 className={`${fontClasses.subheading} text-lg text-gray-900 mb-3`}>Price</h3>
+                <p className={`${fontClasses.heading} text-3xl text-indigo-600`}>{product.price} DH</p>
+              </div>
+
+              <div className="mb-6">
                 <h3 className={`${fontClasses.subheading} text-lg text-gray-900 mb-3`}>Select Size</h3>
                 <div className="grid grid-cols-4 gap-3">
-                  {product.sizes.map((size) => (
+                  {['S', 'M', 'L', 'XL'].map((size) => (
                     <motion.button
                       key={size}
                       whileHover={{ scale: 1.05 }}
                       type="button"
-                      onClick={() => setSelectedSize(size)}
-                      className={`py-2 px-3 rounded-lg border-2 ${selectedSize === size ? 'border-indigo-600 bg-indigo-50 text-indigo-700' : 'border-gray-200 hover:border-gray-300'}`}
+                      onClick={() => setTaille(size)}
+                      className={`py-2 px-3 rounded-lg border-2 ${taille === size ? 'border-indigo-600 bg-indigo-50 text-indigo-700' : 'border-gray-200 hover:border-gray-300'}`}
                     >
                       {size}
                     </motion.button>
@@ -153,16 +219,13 @@ const ProductDetailsPage = () => {
               </div>
 
               <div className="flex items-center justify-between mb-8">
-                <div>
-                  <span className={`${fontClasses.body} text-gray-600`}>Price</span>
-                  <p className={`${fontClasses.heading} text-3xl text-gray-900`}>{product.price} DH</p>
-                </div>
+                <h3 className={`${fontClasses.subheading} text-lg text-gray-900`}>Quantity</h3>
                 <div className="flex items-center">
                   <button 
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
                     className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-l-lg hover:bg-gray-100"
                   >
-                    -
+                    <FiMinus />
                   </button>
                   <div className="w-12 h-10 flex items-center justify-center border-t border-b border-gray-300">
                     {quantity}
@@ -171,14 +234,28 @@ const ProductDetailsPage = () => {
                     onClick={() => setQuantity(quantity + 1)}
                     className="w-10 h-10 flex items-center justify-center border border-gray-300 rounded-r-lg hover:bg-gray-100"
                   >
-                    +
+                    <FiPlus />
                   </button>
                 </div>
               </div>
 
-              {/* Checkout Form */}
-              <form onSubmit={handleSubmitOrder}>
+              {/* Order Form */}
+              <form onSubmit={placeOrder}>
                 <div className="space-y-4 mb-6">
+                  <div>
+                    <label htmlFor="customer_name" className={`${fontClasses.subheading} block text-sm text-gray-700 mb-1`}>
+                      Name
+                    </label>
+                    <input
+                      type="text"
+                      id="customer_name"
+                      value={customer_name}
+                      onChange={(e) => setname(e.target.value)}
+                      className={`${fontClasses.body} w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent`}
+                      placeholder="Type your full name"
+                      required
+                    />
+                  </div>
                   <div>
                     <label htmlFor="phone" className={`${fontClasses.subheading} block text-sm text-gray-700 mb-1`}>
                       Phone Number
@@ -256,12 +333,21 @@ const ProductDetailsPage = () => {
                   </div>
                 </div>
 
+                {orderSuccess && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4 rounded"
+                  >
+                    <p className={`${fontClasses.body} font-medium`}>Order placed successfully!</p>
+                  </motion.div>
+                )}
+
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   type="submit"
-                  disabled={!selectedSize}
-                  className={`${fontClasses.subheading} w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4 px-6 rounded-lg flex items-center justify-center transition-colors duration-300 ${!selectedSize ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  className={`${fontClasses.subheading} w-full bg-indigo-600 hover:bg-indigo-700 text-white py-4 px-6 rounded-lg flex items-center justify-center transition-colors duration-300`}
                 >
                   <FiShoppingBag className="mr-2" />
                   Complete Order
@@ -273,6 +359,4 @@ const ProductDetailsPage = () => {
       </div>
     </div>
   );
-};
-
-export default ProductDetailsPage;
+}
