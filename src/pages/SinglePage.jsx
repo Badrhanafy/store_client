@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams, Link } from 'react-router-dom';
-import { FiShoppingBag, FiHeart, FiStar, FiChevronRight, FiCheck, FiPlus, FiMinus, FiCreditCard, FiTruck, FiImage } from 'react-icons/fi';
+import { FiShoppingBag, FiHeart,FiUser,FiMessageSquare, FiStar, FiChevronRight, FiCheck, FiPlus, FiMinus, FiCreditCard, FiTruck, FiImage } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const fontClasses = {
@@ -26,7 +26,10 @@ export default function ProductDetails() {
   const [isLoading, setIsLoading] = useState(true);
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [direction, setDirection] = useState(0); // For slide animation direction
-
+  const [clientImpression,setImpression]=useState('')
+  const [clientName,setClN]=useState('')
+  const [rating, setRating] = useState(5); // Add this with your other state declarations
+  const [reviewSubmited,setReviewSubmitted]=useState(0)
   useEffect(() => {
     setIsLoading(true);
     Promise.all([
@@ -79,7 +82,30 @@ export default function ProductDetails() {
       alert('Error placing order');
     }
   };
-
+  const saveReview = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post("http://localhost:8000/api/submitImpression", {
+        clientName,
+        clientImpression,
+        rating,
+        productId: id // Include the product ID
+      });
+      
+      // Show success feedback
+      setReviewSubmitted(true);
+      setClN('');
+      setImpression('');
+      setRating(5);
+      
+      // Optional: Hide success message after 3 seconds
+      setTimeout(() => setReviewSubmitted(false), 3000);
+      
+    } catch (error) {
+      console.error('Error submitting review:', error);
+      alert("We couldn't submit your review. Please try again later.");
+    }
+  };
   if (isLoading) return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
@@ -164,7 +190,85 @@ export default function ProductDetails() {
                 ))}
               </div>
             )}
-            
+             <div className="mt-8 bg-white rounded-xl shadow-sm p-6">
+  <div className="flex items-center mb-4">
+    <FiMessageSquare className="text-indigo-600 mr-2" />
+    <h3 className={`${fontClasses.subheading} text-xl text-gray-900`}>Share Your Review</h3>
+  </div>
+  
+  <form onSubmit={saveReview}>
+    <div className="space-y-4">
+      {/* Name Field */}
+      <div>
+        <label htmlFor="clientName" className={`${fontClasses.subheading} block text-sm text-gray-700 mb-1`}>
+          Your Name
+        </label>
+        <div className="relative">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <FiUser className="text-gray-400" />
+          </div>
+          <input
+            type="text"
+            id="clientName"
+            value={clientName}
+            onChange={(e) => setClN(e.target.value)}
+            className={`${fontClasses.body} w-full pl-10 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent`}
+            placeholder="Your name"
+            required
+          />
+        </div>
+      </div>
+
+      {/* Star Rating */}
+      <div>
+        <label className={`${fontClasses.subheading} block text-sm text-gray-700 mb-1`}>
+          Your Rating
+        </label>
+        <div className="flex items-center space-x-1">
+          {[1, 2, 3, 4, 5].map((star) => (
+            <button
+              key={star}
+              type="button"
+              onClick={() => setRating(star)}
+              className="focus:outline-none"
+              aria-label={`Rate ${star} star${star !== 1 ? 's' : ''}`}
+            >
+              <FiStar
+                className={`w-6 h-6 ${star <= rating ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
+              />
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Review Text */}
+      <div>
+        <label htmlFor="clientImpression" className={`${fontClasses.subheading} block text-sm text-gray-700 mb-1`}>
+          Your Review
+        </label>
+        <textarea
+          id="clientImpression"
+          value={clientImpression}
+          onChange={(e) => setImpression(e.target.value)}
+          className={`${fontClasses.body} w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent`}
+          rows="4"
+          placeholder="Share your detailed experience with this product..."
+          required
+        />
+      </div>
+
+      {/* Submit Button */}
+      <motion.button
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
+        type="submit"
+        className={`${fontClasses.subheading} w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 px-6 rounded-lg flex items-center justify-center transition-colors duration-300`}
+      >
+        Submit Review
+      </motion.button>
+    </div>
+  </form>
+</div>
           </div>
 
              {/* Product Details */}
@@ -182,19 +286,7 @@ export default function ProductDetails() {
 
               <p className={`${fontClasses.body} text-gray-700 mb-6`}>{product.description}</p>
 
-              <div className="flex items-center mb-6">
-                <div className="flex">
-                  {[...Array(5)].map((_, i) => (
-                    <FiStar 
-                      key={i} 
-                      className={`${i < 4 ? 'text-yellow-400 fill-current' : 'text-gray-300'}`} 
-                    />
-                  ))}
-                </div>
-                <span className={`${fontClasses.body} text-gray-600 ml-2`}>
-                  (128 reviews)
-                </span>
-              </div>
+             
 
               <div className="mb-6">
                 <h3 className={`${fontClasses.subheading} text-lg text-gray-900 mb-3`}>Price</h3>
