@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { FiUpload, FiPlus, FiX, FiDollarSign, FiHash, FiType } from 'react-icons/fi';
 import { motion } from 'framer-motion';
-
+import {useTranslation} from "react-i18next"
 // Consistent with your store's font classes
 const fontClasses = {
   heading: "font-['Playfair_Display'] font-bold",
@@ -12,6 +12,7 @@ const fontClasses = {
 };
 
 export default function AddProduct() {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -133,8 +134,8 @@ export default function AddProduct() {
       >
         {/* Form Header */}
         <div className="bg-indigo-600 py-6 px-8">
-          <h2 className={`${fontClasses.heading} text-3xl text-white`}>Add New Product</h2>
-          <p className={`${fontClasses.body} text-indigo-100 mt-2`}>Fill in the details for your new product</p>
+          <h2 className={`${fontClasses.heading} text-3xl text-white`}>{t("Add New Product")}</h2>
+          <p className={`${fontClasses.body} text-indigo-100 mt-2`}>{t("Fill in the details for your new product")}</p>
         </div>
 
         {/* Success Message */}
@@ -157,7 +158,7 @@ export default function AddProduct() {
                 {/* Title */}
                 <div className="mb-6">
                   <label className={`${fontClasses.subheading} block text-gray-700 text-sm mb-2`} htmlFor="title">
-                    Product Title
+                    {t("Product Title")}
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -179,7 +180,7 @@ export default function AddProduct() {
                 {/* Description */}
                 <div className="mb-6">
                   <label className={`${fontClasses.subheading} block text-gray-700 text-sm mb-2`} htmlFor="description">
-                    Description
+                    {t("Description")}
                   </label>
                   <textarea
                     id="description"
@@ -219,7 +220,7 @@ export default function AddProduct() {
                 {/* Price */}
                 <div className="mb-6">
                   <label className={`${fontClasses.subheading} block text-gray-700 text-sm mb-2`} htmlFor="price">
-                    Price (DH)
+                    {t("Price (DH)")}
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">

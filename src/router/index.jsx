@@ -11,6 +11,7 @@ import HomePage from "../pages/home"
 import ProductDetailsPage from "../pages/SinglePage"
 import Cart from "../pages/Carte"
 import AllProducts from "../pages/admin/AllProducts"
+import ContactPage from "../pages/Contacts"
 export const router = createBrowserRouter([
   {
     element : <Layout/>,
@@ -50,6 +51,10 @@ export const router = createBrowserRouter([
       {
         path : '/admin/AllProducts',
         element : <AllProducts/>
+      },
+       {
+        path : '/Fortis/Contacts',
+        element : <ContactPage/>
       }
     ]
   }

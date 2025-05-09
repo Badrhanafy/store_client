@@ -4,7 +4,7 @@ import { FiHeart, FiShoppingBag, FiStar, FiChevronRight, FiX } from 'react-icons
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useCart } from './CartContext';
-
+import { t } from 'i18next';
 // Font classes (consistent with homepage)
 const fontClasses = {
   heading: "font-['Playfair_Display'] font-bold",
@@ -211,8 +211,8 @@ export default function ProductList() {
       <div className="container mx-auto px-6">
         <div className="flex flex-col md:flex-row justify-between items-center mb-12">
           <div>
-            <h2 className={`${fontClasses.heading} text-3xl md:text-4xl text-gray-800`}>Our Collection</h2>
-            <p className={`${fontClasses.body} text-gray-600 mt-2`}>Discover pieces that tell your story</p>
+            <h2 className={`${fontClasses.heading} text-3xl md:text-4xl text-gray-800`}>{t("Our Collection")}</h2>
+            <p className={`${fontClasses.body} text-gray-600 mt-2`}>{t("Discover pieces that tell your story")}</p>
           </div>
           <div className="mt-4 md:mt-0 flex items-center">
             <span className={`${fontClasses.subheading} text-gray-600 mr-2`}>View all</span>
