@@ -72,12 +72,13 @@ export const router = createBrowserRouter([
         path : '/Login',
         element: <AdminLogin/>
       },
-      {
+     
+    ]
+  }
+ ,
+     {
         path:"/admin/dashboard",
         element: <AdminDashboard/>
       }
-    ]
-  }
- 
   /// no kida3 h hhh
 ])
