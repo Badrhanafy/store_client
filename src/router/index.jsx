@@ -14,6 +14,8 @@ import AllProducts from "../pages/admin/AllProducts"
 import ContactPage from "../pages/Contacts"
 import Kobiyat from "../pages/Kobiyat"
 import Casketat from "../pages/casketat"
+import AdminLogin from "../pages/admin/AdminLogin"
+import AdminDashboard from "../pages/admin/Dashboard"
 export const router = createBrowserRouter([
   {
     element : <Layout/>,
@@ -30,10 +32,10 @@ export const router = createBrowserRouter([
         path : '/',
         element : <HomePage/>
       },
-      {
+    /*   {
         path : '/login',
         element : <Login/>
-      },
+      }, */
       {
         path : '/signup',
         element : <Signup/>
@@ -65,6 +67,14 @@ export const router = createBrowserRouter([
         {
         path : '/products/casketat',
         element: <Casketat/>
+      },
+       {
+        path : '/Login',
+        element: <AdminLogin/>
+      },
+      {
+        path:"/admin/dashboard",
+        element: <AdminDashboard/>
       }
     ]
   }
