@@ -21,6 +21,15 @@ const resources = {
       "Discover pieces that tell your story":"Discover pieces that tell your story",
       "Discover pieces that tell your story":"Discover pieces that tell your story",
       "Our Collection":"Our Collection",
+       collection: {
+      kobiyatTitle: "Traditional Kobiyat Collection",
+      errorLoading: "Error loading products",
+      emptyTitle: "No Kobiyat Items Found",
+      emptyMessage: "We couldn't find any items in this collection",
+      noDescription: "No description available",
+      currency: "DH",
+      addToCart: "Add to Cart"
+    },
        contact: {
       title: "Get in Touch",
       subtitle: "We'd love to hear from you! Reach out for collaborations or just a friendly hello 👋",
@@ -120,6 +129,15 @@ const resources = {
       "Discover pieces that tell your story":"Découvrez des pièces qui racontent votre histoire",
       "Our Collection":"Nos Collections",
       "New Arrivals":"Nouveautées",
+      collection: {
+      kobiyatTitle: "Collection Traditionnelle de Kobiyat",
+      errorLoading: "Erreur lors du chargement des produits",
+      emptyTitle: "Aucun article Kobiyat trouvé",
+      emptyMessage: "Nous n'avons trouvé aucun article dans cette collection",
+      noDescription: "Aucune description disponible",
+      currency: "DH",
+      addToCart: "Ajouter au panier"
+    },
       contact: {
       title: "Contactez-nous",
       subtitle: "Nous serions ravis d'avoir de vos nouvelles ! Contactez-nous pour des collaborations ou juste pour dire bonjour 👋",
@@ -219,6 +237,15 @@ const resources = {
       "Discover pieces that tell your story":"اكتشف قطعًا تروي قصتك",
       "Our Collection":"مجموعتنا",
       "New Arrivals":" الجديد",
+      collection: {
+      kobiyatTitle: "مجموعة القوبيات التقليدية",
+      errorLoading: "خطأ في تحميل المنتجات",
+      emptyTitle: "لا توجد عناصر قوبيات",
+      emptyMessage: "لم نتمكن من العثور على أي عناصر في هذه المجموعة",
+      noDescription: "لا يوجد وصف متاح",
+      currency: "درهم",
+      addToCart: "أضف إلى السلة"
+    },
        contact: {
       title: "اتصل بنا",
       subtitle: "نحن نحب أن نسمع منك! تواصل معنا للتعاون أو فقط لتحية ودية 👋",

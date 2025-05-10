@@ -12,6 +12,8 @@ import ProductDetailsPage from "../pages/SinglePage"
 import Cart from "../pages/Carte"
 import AllProducts from "../pages/admin/AllProducts"
 import ContactPage from "../pages/Contacts"
+import Kobiyat from "../pages/Kobiyat"
+import Casketat from "../pages/casketat"
 export const router = createBrowserRouter([
   {
     element : <Layout/>,
@@ -55,6 +57,14 @@ export const router = createBrowserRouter([
        {
         path : '/Fortis/Contacts',
         element : <ContactPage/>
+      },
+      {
+        path : '/products/9obiyat',
+        element: <Kobiyat/>
+      },
+        {
+        path : '/products/casketat',
+        element: <Casketat/>
       }
     ]
   }

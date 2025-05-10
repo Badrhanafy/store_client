@@ -6,10 +6,10 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useCart } from './CartContext';
 
-export default function Kobiyat() {
+export default function Casketat() {
   const { t } = useTranslation();
   const { addToCart } = useCart();
-  const [kobiyat, setKobiyat] = useState([]);
+  const [casketat, setcasketat] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -17,10 +17,10 @@ export default function Kobiyat() {
     const fetchProducts = async () => {
       try {
         const response = await axios.get('http://localhost:8000/api/products');
-        const kobiyatProducts = response.data.filter(
-          product => product.category === 'kobiyat'
+        const casketatProducts = response.data.filter(
+          product => product.category === 'cascketat'
         );
-        setKobiyat(kobiyatProducts);
+        setcasketat(casketatProducts);
       } catch (err) {
         setError(err.message);
         console.error('Error fetching products:', err);
@@ -58,11 +58,11 @@ export default function Kobiyat() {
     );
   }
 
-  if (kobiyat.length === 0) {
+  if (casketat.length === 0) {
     return (
       <div className="text-center py-16">
         <h3 className="text-xl font-medium text-gray-700 mb-2">
-          {t('collection.emptyTitle')}
+          No items found 
         </h3>
         <p className="text-gray-500 mb-6">
           {t('collection.emptyMessage')}
@@ -74,11 +74,11 @@ export default function Kobiyat() {
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold text-center mb-10 text-gray-800">
-        {t('collection.kobiyatTitle')}
+        {t('collection.casketatTitle')}
       </h1>
       
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {kobiyat.map((product, index) => (
+        {casketat.map((product, index) => (
           <motion.div
             key={product.id}
             initial={{ opacity: 0, y: 20 }}
