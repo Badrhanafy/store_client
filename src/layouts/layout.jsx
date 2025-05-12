@@ -5,7 +5,7 @@ import { FiSearch, FiUser, FiHeart, FiShoppingBag, FiMenu, FiX, FiGlobe, FiChevr
 import { NavLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import axios from "axios";
-import { useTranslation, initReactI18next } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 
 export default function Layout() {
   const fontClasses = {
@@ -48,17 +48,17 @@ export default function Layout() {
     }
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     axios.get("http://127.0.0.1:8000/api/products").then(
-      res=>setProducts(res.data))
-  },[id])
+      res => setProducts(res.data))
+  }, [id]);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     console.log('Searching for:', searchQuery);
-    products.filter((product)=>{
-      return product.title===searchQuery
-    }).map((produit,i)=>{
+    products.filter((product) => {
+      return product.title === searchQuery
+    }).map((produit, i) => {
       return <div className='bg-red-400'>  {produit.price}</div>
     })
   };
@@ -85,26 +85,28 @@ export default function Layout() {
             <div className="flex items-center justify-between">
               {/* Logo */}
               <div className="flex-shrink-0">
-                <NavLink to="/">
-                  <img
-                    src="FORTIS-01.png"
-                    alt="Fortis Logo"
-                    className="h-12 md:h-16 w-auto max-w-[180px] md:max-w-[220px] object-contain"
-                  />
-                </NavLink>
+                
+                  <NavLink to="/" className="flex-shrink-0">
+                    <img
+                      src="FORTIS-01.png"
+                      alt="Fortis Logo"
+                      style={{position:"absolute",marginTop:"-22vh",left:"-5vh"}}
+                      className="h-26 md:h-22 w-auto max-w-[220px] md:max-w-[280px] object-contain transform hover:scale-105 transition-transform duration-200"
+                    />
+                  </NavLink>
               </div>
 
               {/* Desktop Navigation */}
-              <div className="hidden md:flex items-center space-x-6 flex-1 mx-8">
+              <center>
+                         <div className="hidden md:flex items-center space-x-6 flex-1 mx-8">
                 {navLinks.map((link) => (
-                  <NavLink 
-                    key={link.to} 
-                    to={link.to} 
-                    className={({ isActive }) => 
-                      `px-3 py-2 transition-colors duration-300 ${
-                        isActive 
-                          ? 'text-indigo-600 font-medium border-b-2 border-indigo-600' 
-                          : 'text-gray-700 hover:text-indigo-600'
+                  <NavLink
+                    key={link.to}
+                    to={link.to}
+                    className={({ isActive }) =>
+                      `px-3 py-2 transition-colors duration-300 ${isActive
+                        ? 'text-indigo-600 font-medium border-b-2 border-indigo-600'
+                        : 'text-gray-700 hover:text-indigo-600'
                       }`
                     }
                   >
@@ -112,20 +114,28 @@ export default function Layout() {
                   </NavLink>
                 ))}
               </div>
+              </center>
 
               {/* Desktop Icons */}
               <div className="hidden md:flex items-center space-x-4 flex-shrink-0">
-                <div className="relative">
-                  <button 
+                {/* Search Icon with Tooltip */}
+                <div className="relative group">
+                  <button
                     onClick={toggleSearch}
                     className="p-2 text-gray-600 hover:text-indigo-600"
                   >
                     <FiSearch size={20} />
                   </button>
-                  
+                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block">
+                    <div className="bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap">
+                      {t("Search")}
+                      <div className="absolute top-full left-1/2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-l-transparent border-r-transparent border-b-black transform -translate-x-1/2"></div>
+                    </div>
+                  </div>
+
                   <motion.div
                     initial={{ opacity: 0, width: 0 }}
-                    animate={{ 
+                    animate={{
                       opacity: isSearchOpen ? 1 : 0,
                       width: isSearchOpen ? '250px' : 0
                     }}
@@ -141,7 +151,7 @@ export default function Layout() {
                         placeholder={t("Search products...")}
                         className="px-4 py-2 w-full focus:outline-none"
                       />
-                      <button 
+                      <button
                         type="submit"
                         className="px-3 text-indigo-600 hover:bg-indigo-50"
                       >
@@ -151,9 +161,9 @@ export default function Layout() {
                   </motion.div>
                 </div>
 
-                {/* Language Selector */}
-                <div className="relative">
-                  <button 
+                {/* Language Selector with Tooltip */}
+                <div className="relative group">
+                  <button
                     onClick={toggleLanguage}
                     className="flex items-center p-2 text-gray-600 hover:text-indigo-600"
                   >
@@ -161,7 +171,13 @@ export default function Layout() {
                     <span className="text-sm uppercase">{i18n.language}</span>
                     <FiChevronDown size={16} className="ml-1" />
                   </button>
-                  
+                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block">
+                    <div className="bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap">
+                      {t("Language")}
+                      <div className="absolute top-full left-1/2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-l-transparent border-r-transparent border-b-black transform -translate-x-1/2"></div>
+                    </div>
+                  </div>
+
                   {isLanguageOpen && (
                     <div className="absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg z-50">
                       <div className="py-1">
@@ -188,25 +204,54 @@ export default function Layout() {
                   )}
                 </div>
 
-                <button className="p-2 text-gray-600 hover:text-indigo-600">
-                  <FiUser size={20} />
-                </button>
-                <button className="p-2 text-gray-600 hover:text-indigo-600">
-                  <FiHeart size={20} />
-                </button>
-                <div className="p-2 text-gray-600 hover:text-indigo-600 relative">
-                  <NavLink to="/cart">
-                    {({ isActive }) => (
-                      <div className="relative">
-                        <FiShoppingBag size={20} className={isActive ? 'text-indigo-600' : ''} />
-                        {cartCount > 0 && (
-                          <span className="absolute -top-1 -right-1 bg-indigo-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                            {cartCount}
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </NavLink>
+                {/* User Icon with Tooltip */}
+                <div className="relative group">
+                  <button className="p-2 text-gray-600 hover:text-indigo-600">
+                    <FiUser size={20} />
+                  </button>
+                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block">
+                    <div className="bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap">
+                      {t("Account")}
+                      <div className="absolute top-full left-1/2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-l-transparent border-r-transparent border-b-black transform -translate-x-1/2"></div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Wishlist Icon with Tooltip */}
+                <div className="relative group">
+                  <button className="p-2 text-gray-600 hover:text-indigo-600">
+                    <FiHeart size={20} />
+                  </button>
+                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block">
+                    <div className="bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap">
+                      {t("Wishlist")}
+                      <div className="absolute top-full left-1/2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-l-transparent border-r-transparent border-b-black transform -translate-x-1/2"></div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Cart Icon with Tooltip */}
+                <div className="relative group">
+                  <div className="p-2 text-gray-600 hover:text-indigo-600 relative">
+                    <NavLink to="/cart">
+                      {({ isActive }) => (
+                        <div className="relative">
+                          <FiShoppingBag size={20} className={isActive ? 'text-indigo-600' : ''} />
+                          {cartCount > 0 && (
+                            <span className="absolute -top-1 -right-1 bg-indigo-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                              {cartCount}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </NavLink>
+                  </div>
+                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block">
+                    <div className="bg-black text-white text-xs rounded py-1 px-2 whitespace-nowrap">
+                      {t("Cart")}
+                      <div className="absolute top-full left-1/2 w-0 h-0 border-l-4 border-r-4 border-b-4 border-l-transparent border-r-transparent border-b-black transform -translate-x-1/2"></div>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -231,7 +276,7 @@ export default function Layout() {
               <NavLink to="/" className="block" onClick={toggleMenu}>
                 <img
                   src="FORTIS-01.png"
-                  style={{width:"30vh",height:"10vh",border:"1px solid blue"}}
+                  style={{ width: "30vh", height: "10vh", border: "1px solid blue" }}
                   alt="Fortis Logo"
                   className="w-46 object-contain filter brightness-0 invert"
                 />
@@ -255,7 +300,7 @@ export default function Layout() {
                   placeholder={t("Search products...")}
                   className="px-4 py-3 w-full bg-transparent text-white focus:outline-none"
                 />
-                <button 
+                <button
                   type="submit"
                   className="px-4 text-white hover:bg-gray-700"
                 >
@@ -266,14 +311,13 @@ export default function Layout() {
 
             <div className="flex flex-col space-y-6 flex-1">
               {navLinks.map((link) => (
-                <NavLink 
-                  key={link.to} 
-                  to={link.to} 
-                  className={({ isActive }) => 
-                    `px-3 py-4 transition-colors duration-300 text-xl font-medium ${
-                      isActive 
-                        ? 'text-indigo-400 border-l-4 border-indigo-400 pl-4' 
-                        : 'text-white hover:text-indigo-400'
+                <NavLink
+                  key={link.to}
+                  to={link.to}
+                  className={({ isActive }) =>
+                    `px-3 py-4 transition-colors duration-300 text-xl font-medium ${isActive
+                      ? 'text-indigo-400 border-l-4 border-indigo-400 pl-4'
+                      : 'text-white hover:text-indigo-400'
                     }`
                   }
                   onClick={toggleMenu}
@@ -287,7 +331,7 @@ export default function Layout() {
             <div className="px-3 py-4">
               <div className="flex items-center space-x-4">
                 <FiGlobe size={24} className="text-white" />
-                <select 
+                <select
                   onChange={(e) => changeLanguage(e.target.value)}
                   value={i18n.language}
                   className="bg-gray-800 text-white px-4 py-2 rounded-lg"
@@ -328,7 +372,8 @@ export default function Layout() {
       <main style={{ position: "relative", top: "12vh" }}>
         <Outlet />
       </main>
-      <footer>footer</footer>
+
+      
     </div>
   );
 }

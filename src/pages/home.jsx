@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 const HomePage = () => {
   const { t } = useTranslation();
   const [currentSlide, setCurrentSlide] = useState(0);
-  
+
   // Font classes
   const fontClasses = {
     heading: "font-['Playfair_Display'] font-bold",
@@ -18,20 +18,20 @@ const HomePage = () => {
 
   // Category data with personalized links
   const categories = [
-    { 
-      name: "9obiyat", 
+    {
+      name: "9obiyat",
       image: "clothes/90biya.jpg",
       link: "/products/9obiyat",
       label: t('home.categories.9obiyat')
     },
-    { 
-      name: "chapeau", 
+    {
+      name: "chapeau",      
       image: "clothes/caskette.jpeg",
       link: "/products/casketat",
       label: t('home.categories.casketat')
     },
-    { 
-      name: "tshirts", 
+    {
+      name: "tshirts",
       image: "clothes/thirt2.jpg",
       link: "/products/shirts",
       label: t('home.categories.shirts')
@@ -75,19 +75,19 @@ const HomePage = () => {
       {/* Hero Slider */}
       <div className="relative h-screen pt-16 overflow-hidden">
         {slides.map((slide, index) => (
-          <div 
+          <div
             key={index}
             className={`absolute inset-0 transition-opacity duration-1000 flex items-center ${currentSlide === index ? 'opacity-100' : 'opacity-0'}`}
           >
             <div className="absolute inset-0">
-              <img 
-                src={slide.image} 
-                alt={slide.title} 
+              <img
+                src={slide.image}
+                alt={slide.title}
                 className="w-full h-full object-cover object-center"
               />
               <div className="absolute inset-0 bg-black bg-opacity-30"></div>
             </div>
-            
+
             <div className="container mx-auto px-6 relative z-10 text-white">
               <div className="max-w-lg">
                 <h1 className={`${fontClasses.heading} text-5xl md:text-6xl mb-4 leading-tight`}>
@@ -103,7 +103,7 @@ const HomePage = () => {
             </div>
           </div>
         ))}
-        
+
         <div className="absolute bottom-10 left-0 right-0 flex justify-center space-x-2 z-10">
           {slides.map((_, index) => (
             <button
@@ -122,17 +122,17 @@ const HomePage = () => {
           <h2 className={`${fontClasses.heading} text-3xl text-center mb-12`}>
             {t('home.categoriesTitle')}
           </h2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {categories.map((category, index) => (
-              <motion.div 
+              <motion.div
                 key={index}
                 whileHover={{ scale: 1.02 }}
                 className="group relative overflow-hidden rounded-lg shadow-lg"
               >
-                <img 
-                  src={category.image} 
-                  alt={category.name} 
+                <img
+                  src={category.image}
+                  alt={category.name}
                   className="w-full h-80 object-cover transition-transform duration-500 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
@@ -141,7 +141,7 @@ const HomePage = () => {
                   </h3>
                 </div>
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <Link 
+                  <Link
                     to={category.link}
                     className="bg-white text-gray-800 px-6 py-2 rounded-full font-medium hover:bg-gray-100 transition-colors"
                   >
@@ -154,17 +154,83 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Rest of your component remains the same */}
+
       {/* Newsletter Section */}
       <section className="py-16 bg-indigo-600 text-white">
-        {/* ... existing newsletter code ... */}
+        <div className="container mx-auto px-6 text-center">
+          <h2 className={`${fontClasses.heading} text-3xl mb-4`}>{t("home.newsletter.title")}</h2>
+          <p className={`${fontClasses.body} max-w-lg mx-auto mb-8`}>
+            {t("home.newsletter.subtitle")}
+          </p>
+          <div className="flex flex-col sm:flex-row max-w-md mx-auto gap-2">
+            <input
+              type="email"
+              placeholder={t("home.newsletter.placeholder")}
+              className="flex-grow px-4 py-3 rounded-full text-gray-800 focus:outline-none"
+            />
+            <button className={`${fontClasses.body} bg-black hover:bg-gray-900 text-white px-6 py-3 rounded-full transition-colors duration-300`}>
+              {t("home.newsletter.button")}
+            </button>
+          </div>
+        </div>
       </section>
 
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-12">
-        {/* ... existing footer code ... */}
-      </footer>
-    </div>
+        <div className="container mx-auto px-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+              <h3 className={`${fontClasses.heading} text-xl mb-4`}>{t("footer.brandName")}</h3>
+              <p className={`${fontClasses.body} text-gray-400`}>
+                {t("footer.tagline")}
+              </p>
+            </div>
+            <div>
+              <h4 className={`${fontClasses.subheading} text-lg mb-4`}>{t("footer.shop")}</h4>
+              <ul className="space-y-2">
+                {t("footer.shopLinks", { returnObjects: true }).map((item) => (
+                  <li key={item}>
+                    <a href="#" className={`${fontClasses.body} text-gray-400 hover:text-white transition-colors`}>
+                      {item}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h4 className={`${fontClasses.subheading} text-lg mb-4`}>{t("footer.company")}</h4>
+              <ul className="space-y-2">
+                {t("footer.companyLinks", { returnObjects: true }).map((item) => (
+                  <li key={item}>
+                    <a href="#" className={`${fontClasses.body} text-gray-400 hover:text-white transition-colors`}>
+                      {item}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h4 className={`${fontClasses.subheading} text-lg mb-4`}>{t("footer.connect")}</h4>
+              <div className="flex space-x-4">
+                {t("footer.socialLinks", { returnObjects: true }).map((social) => (
+                  <a
+                    key={social}
+                    href="#"
+                    className={`${fontClasses.body} text-gray-400 hover:text-white transition-colors`}
+                  >
+                    {social}
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+            <p className={`${fontClasses.body}`}>
+              &copy; {new Date().getFullYear()} {t("footer.brandName")}. {t("footer.copyright")}
+            </p>
+          </div>
+        </div>
+      </footer></div>
   );
 };
 

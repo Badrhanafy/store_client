@@ -4,6 +4,7 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 
 // Translations
 const resources = {
+  
   en: {
     translation: {
       "Home": "Home",
@@ -78,7 +79,7 @@ const resources = {
       }
     },
     footer: {
-      brandName: "StyleHaven",
+      brandName: "FORTIS",
       tagline: "Your destination for modern, stylish clothing and accessories",
       shop: "Shop",
       shopLinks: ["All Products", "New Arrivals", "Best Sellers", "Sale"],
@@ -110,8 +111,38 @@ const resources = {
         orderSuccess: "Order sent successfully! ✅",
         orderError: "Failed to send order ❌"
       }
-    }
-    }
+    },
+    dashboard: 'Dashboard',
+      orders: 'Orders',
+      products: 'Products',
+      storeSettings: 'Store Settings',
+      logout: 'Logout',
+      orderManagement: 'Order Management',
+      searchOrders: 'Search orders...',
+      noOrdersFound: 'No orders found matching your search criteria.',
+      invoice: 'INVOICE',
+      customerInformation: 'Customer Information',
+      orderItems: 'Order Items',
+      product: 'Product',
+      price: 'Price',
+      quantity: 'Quantity',
+      total: 'Total',
+      subtotal: 'Subtotal',
+      shipping: 'Shipping',
+      tax: 'Tax',
+      paymentInformation: 'Payment Information',
+      method: 'Method',
+      status: 'Status',
+      transactionId: 'Transaction ID',
+      printInvoice: 'Print Invoice',
+      close: 'Close',
+      name: 'Name',
+      phone: 'Phone',
+      email: 'Email',
+      address: 'Address',
+      date: 'Date',
+    },
+    
   },
   fr: {
     translation: {
@@ -186,7 +217,7 @@ const resources = {
       }
     },
     footer: {
-      brandName: "StyleHaven",
+      brandName: "FORTIS",
       tagline: "Votre destination pour des vêtements et accessoires modernes et élégants",
       shop: "Boutique",
       shopLinks: ["Tous les produits", "Nouveautés", "Meilleures ventes", "Soldes"],
@@ -218,7 +249,36 @@ const resources = {
         orderSuccess: "Commande envoyée avec succès! ✅",
         orderError: "Échec de l'envoi de la commande ❌"
       }
-    }
+    },
+    dashboard: 'Tableau de bord',
+      orders: 'Commandes',
+      products: 'Produits',
+      storeSettings: 'Paramètres du magasin',
+      logout: 'Déconnexion',
+      orderManagement: 'Gestion des commandes',
+      searchOrders: 'Rechercher des commandes...',
+      noOrdersFound: 'Aucune commande trouvée correspondant à vos critères de recherche.',
+      invoice: 'FACTURE',
+      customerInformation: 'Informations client',
+      orderItems: 'Articles commandés',
+      product: 'Produit',
+      price: 'Prix',
+      quantity: 'Quantité',
+      total: 'Total',
+      subtotal: 'Sous-total',
+      shipping: 'Livraison',
+      tax: 'Taxe',
+      paymentInformation: 'Informations de paiement',
+      method: 'Méthode',
+      status: 'Statut',
+      transactionId: 'ID de transaction',
+      printInvoice: 'Imprimer la facture',
+      close: 'Fermer',
+      name: 'Nom',
+      phone: 'Téléphone',
+      email: 'Email',
+      address: 'Adresse',
+      date: 'Date',
     }
   },
   ar: {
@@ -294,7 +354,7 @@ const resources = {
       }
     },
     footer: {
-      brandName: "StyleHaven",
+      brandName: "FORTIS",
       tagline: "وجهتك للملابس والإكسسوارات العصرية والأنيقة",
       shop: "تسوق",
       shopLinks: ["جميع المنتجات", "وصل حديثاً", "الأكثر مبيعاً", "تخفيضات"],
@@ -326,7 +386,36 @@ const resources = {
         orderSuccess: "تم إرسال الطلب بنجاح! ✅",
         orderError: "فشل إرسال الطلب ❌"
       }
-    }
+    },
+     dashboard: 'لوحة التحكم',
+      orders: 'الطلبات',
+      products: 'المنتجات',
+      storeSettings: 'إعدادات المتجر',
+      logout: 'تسجيل الخروج',
+      orderManagement: 'إدارة الطلبات',
+      searchOrders: 'ابحث عن الطلبات...',
+      noOrdersFound: 'لم يتم العثور على طلبات تطابق معايير البحث الخاصة بك.',
+      invoice: 'فاتورة',
+      customerInformation: 'معلومات العميل',
+      orderItems: 'عناصر الطلب',
+      product: 'المنتج',
+      price: 'السعر',
+      quantity: 'الكمية',
+      total: 'المجموع',
+      subtotal: 'المجموع الفرعي',
+      shipping: 'الشحن',
+      tax: 'الضريبة',
+      paymentInformation: 'معلومات الدفع',
+      method: 'طريقة',
+      status: 'الحالة',
+      transactionId: 'معرف المعاملة',
+      printInvoice: 'طباعة الفاتورة',
+      close: 'إغلاق',
+      name: 'الاسم',
+      phone: 'الهاتف',
+      email: 'البريد الإلكتروني',
+      address: 'العنوان',
+      date: 'التاريخ',
       
     }
   },

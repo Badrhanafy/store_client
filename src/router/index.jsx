@@ -16,6 +16,7 @@ import Kobiyat from "../pages/Kobiyat"
 import Casketat from "../pages/casketat"
 import AdminLogin from "../pages/admin/AdminLogin"
 import AdminDashboard from "../pages/admin/Dashboard"
+import ProductsTab from "../pages/admin/ProductsTab"
 export const router = createBrowserRouter([
   {
     element : <Layout/>,
@@ -79,6 +80,10 @@ export const router = createBrowserRouter([
      {
         path:"/admin/dashboard",
         element: <AdminDashboard/>
+      },
+      {
+        path:"/admin/Products",
+        element: <ProductsTab/>
       }
   /// no kida3 h hhh
 ])
