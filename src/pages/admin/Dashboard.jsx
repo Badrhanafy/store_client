@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FiShoppingCart, FiUsers, FiDollarSign, FiPrinter, FiPieChart, FiSettings, FiLogOut, FiMenu, FiX, FiSearch, FiEdit, FiTrash2 } from 'react-icons/fi';
+import { FiShoppingCart, FiUsers, FiDollarSign, FiPrinter, FiPieChart, FiSettings, FiLogOut, FiMenu, FiX, FiSearch, FiEdit, FiTrash2, FiPlus, FiImage, FiChevronDown, FiChevronUp } from 'react-icons/fi';
 import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
-
+import { motion, AnimatePresence } from 'framer-motion';
 const AdminDashboard = () => {
   const { t, i18n } = useTranslation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -22,6 +22,9 @@ const AdminDashboard = () => {
   });
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showInvoice, setShowInvoice] = useState(false);
+  const [expandedProductId, setExpandedProductId] = useState(null);
+  const [selectedProductImages, setSelectedProductImages] = useState([]);
+  const [imageUploading, setImageUploading] = useState(false);
 
   // API base URL
   const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
@@ -31,7 +34,37 @@ const AdminDashboard = () => {
     i18n.changeLanguage(lng);
     document.dir = lng === 'ar' ? 'rtl' : 'ltr';
   };
+  // Add these animation variants at the top of your component
+  const expandVariants = {
+    hidden: {
+      opacity: 0,
+      height: 0,
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut"
+      }
+    },
+    visible: {
+      opacity: 1,
+      height: "auto",
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut"
+      }
+    }
+  };
 
+  const imageUploadVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.3,
+        staggerChildren: 0.1
+      }
+    }
+  };
   // Safe number formatting function
   const formatPrice = (price) => {
     const num = typeof price === 'string' ? parseFloat(price) : price;
@@ -53,6 +86,52 @@ const AdminDashboard = () => {
   // Print invoice
   const printInvoice = () => {
     window.print();
+  };
+
+  // Toggle product details expansion
+  const toggleProductDetails = async (productId) => {
+    if (expandedProductId === productId) {
+      setExpandedProductId(null);
+    } else {
+      setExpandedProductId(productId);
+      try {
+        const response = await axios.get(`${API_URL}/products/${productId}/images`);
+        setSelectedProductImages(response.data.images || []);
+      } catch (error) {
+        console.error('Error fetching product images:', error);
+        toast.error('Failed to load product images');
+      }
+    }
+  };
+
+  // Handle image upload
+  const handleImageUpload = async (e, productId) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setImageUploading(true);
+    const formData = new FormData();
+    for (let i = 0; i < files.length; i++) {
+      formData.append('images[]', files[i]);
+    }
+
+    try {
+      await axios.post(`http://localhost:8000/api/admin/products/${productId}/add-images`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      toast.success('Images uploaded successfully!');
+      // Refresh product images
+      const response = await axios.get(`${API_URL}/products/${productId}/images`);
+      setSelectedProductImages(response.data.images || []);
+    } catch (error) {
+      console.error('Error uploading images:', error);
+      toast.error('Failed to upload images');
+    } finally {
+      setImageUploading(false);
+      e.target.value = ''; // Reset file input
+    }
   };
 
   // Fetch orders from Laravel backend
@@ -93,7 +172,18 @@ const AdminDashboard = () => {
       setError(t('failedToFetchProducts'));
     }
   };
-
+  //////////delete image
+  const deleteImage = async (productId, imageId) => {
+    try {
+      const response = await axios.delete(`${API_URL}/products/${productId}/images/${imageId}`);
+      toast.success(response.data.message);
+      // Refresh images after deletion
+      const imagesResponse = await axios.get(`${API_URL}/products/${productId}/images`);
+      setSelectedProductImages(imagesResponse.data.images || []);
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Failed to delete image');
+    }
+  };
   // Calculate dashboard statistics
   const calculateStats = (orders) => {
     // Calculate total sales only for completed orders
@@ -332,19 +422,19 @@ const AdminDashboard = () => {
         <div className="absolute bottom-0 w-full p-4 border-t border-indigo-700">
           <div className="flex flex-col space-y-2">
             <div className="flex space-x-2">
-              <button 
+              <button
                 onClick={() => changeLanguage('en')}
                 className={`px-2 py-1 text-xs rounded ${i18n.language === 'en' ? 'bg-white text-indigo-800' : 'bg-indigo-700'}`}
               >
                 EN
               </button>
-              <button 
+              <button
                 onClick={() => changeLanguage('fr')}
                 className={`px-2 py-1 text-xs rounded ${i18n.language === 'fr' ? 'bg-white text-indigo-800' : 'bg-indigo-700'}`}
               >
                 FR
               </button>
-              <button 
+              <button
                 onClick={() => changeLanguage('ar')}
                 className={`px-2 py-1 text-xs rounded ${i18n.language === 'ar' ? 'bg-white text-indigo-800' : 'bg-indigo-700'}`}
               >
@@ -423,126 +513,137 @@ const AdminDashboard = () => {
             </div>
           )}
 
-{activeTab === 'dashboard' && (
-  <div>
-    <h2 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6">{t('storeOverview')}</h2>
+          {activeTab === 'dashboard' && (
+            <div>
+              <h2 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6">{t('storeOverview')}</h2>
 
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
-      {/* Total Sales Card */}
-      <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm">
-        <div className="flex items-center">
-          <div className="p-2 sm:p-3 rounded-lg bg-indigo-100 text-indigo-600 mr-3 sm:mr-4">
-            <FiDollarSign size={20} className="sm:w-6 sm:h-6" />
-          </div>
-          <div>
-            <p className="text-xs sm:text-sm text-gray-500">{t('totalSales')}</p>
-            <p className="text-lg sm:text-2xl font-bold">${stats.totalSales.toLocaleString(i18n.language)}</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Pending Orders Card */}
-      <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm">
-        <div className="flex items-center">
-          <div className="p-2 sm:p-3 rounded-lg bg-yellow-100 text-yellow-600 mr-3 sm:mr-4">
-            <FiShoppingCart size={20} className="sm:w-6 sm:h-6" />
-          </div>
-          <div>
-            <p className="text-xs sm:text-sm text-gray-500">{t('pendingOrders')}</p>
-            <p className="text-lg sm:text-2xl font-bold">{stats.pendingOrders.toLocaleString(i18n.language)}</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Completed Orders Card */}
-      <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm">
-        <div className="flex items-center">
-          <div className="p-2 sm:p-3 rounded-lg bg-green-100 text-green-600 mr-3 sm:mr-4">
-            <FiShoppingCart size={20} className="sm:w-6 sm:h-6" />
-          </div>
-          <div>
-            <p className="text-xs sm:text-sm text-gray-500">{t('completedOrders')}</p>
-            <p className="text-lg sm:text-2xl font-bold">{stats.completedOrders.toLocaleString(i18n.language)}</p>
-          </div>
-        </div>
-      </div>
-
-     
-    </div>
-
-    {/* Recent orders preview */}
-    <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm">
-      <div className="flex justify-between items-center mb-4 sm:mb-6">
-        <h3 className="text-base sm:text-lg font-semibold">{t('recentOrders')}</h3>
-        <button
-          className="text-indigo-600 hover:text-indigo-800 text-sm sm:text-base"
-          onClick={() => setActiveTab('orders')}
-        >
-          {t('viewAll')}
-        </button>
-      </div>
-
-      {loading ? (
-        <div className="flex justify-center py-8">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
-        </div>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('orderId')}
-                </th>
-                <th className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('customer')}
-                </th>
-                <th className="hidden sm:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('date')}
-                </th>
-                <th className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('status')}
-                </th>
-                <th className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  {t('amount')}
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {orders.slice(0, 5).map(order => (
-                <tr key={order.id}>
-                  <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    #{order.id}
-                  </td>
-                  <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap text-sm text-gray-500">
-                    <div className="truncate max-w-[100px] sm:max-w-none">
-                      {order.customer_name || t('guest')}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+                {/* Total Sales Card */}
+                <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm">
+                  <div className="flex items-center">
+                    <div className="p-2 sm:p-3 rounded-lg bg-indigo-100 text-indigo-600 mr-3 sm:mr-4">
+                      <FiDollarSign size={20} className="sm:w-6 sm:h-6" />
                     </div>
-                  </td>
-                  <td className="hidden sm:table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {formatDate(order.created_at)}
-                  </td>
-                  <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                    ${order.status === 'completed' ? 'bg-green-100 text-green-800' : ''}
-                    ${order.status === 'shipped' ? 'bg-blue-100 text-blue-800' : ''}
-                    ${order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : ''}
-                    ${order.status === 'cancelled' ? 'bg-red-100 text-red-800' : ''}`}>
-                      {t(order.status)}
-                    </span>
-                  </td>
-                  <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap text-sm text-gray-500">
-                    ${formatPrice(order.total_price)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </div>
-  </div>
-)}
+                    <div>
+                      <p className="text-xs sm:text-sm text-gray-500">{t('totalSales')}</p>
+                      <p className="text-lg sm:text-2xl font-bold">${stats.totalSales.toLocaleString(i18n.language)}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Pending Orders Card */}
+                <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm">
+                  <div className="flex items-center">
+                    <div className="p-2 sm:p-3 rounded-lg bg-yellow-100 text-yellow-600 mr-3 sm:mr-4">
+                      <FiShoppingCart size={20} className="sm:w-6 sm:h-6" />
+                    </div>
+                    <div>
+                      <p className="text-xs sm:text-sm text-gray-500">{t('pendingOrders')}</p>
+                      <p className="text-lg sm:text-2xl font-bold">{stats.pendingOrders.toLocaleString(i18n.language)}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Completed Orders Card */}
+                <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm">
+                  <div className="flex items-center">
+                    <div className="p-2 sm:p-3 rounded-lg bg-green-100 text-green-600 mr-3 sm:mr-4">
+                      <FiShoppingCart size={20} className="sm:w-6 sm:h-6" />
+                    </div>
+                    <div>
+                      <p className="text-xs sm:text-sm text-gray-500">{t('completedOrders')}</p>
+                      <p className="text-lg sm:text-2xl font-bold">{stats.completedOrders.toLocaleString(i18n.language)}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Average Order Value Card */}
+                <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm">
+                  <div className="flex items-center">
+                    <div className="p-2 sm:p-3 rounded-lg bg-purple-100 text-purple-600 mr-3 sm:mr-4">
+                      <FiShoppingCart size={20} className="sm:w-6 sm:h-6" />
+                    </div>
+                    <div>
+                      <p className="text-xs sm:text-sm text-gray-500">{t('averageOrderValue')}</p>
+                      <p className="text-lg sm:text-2xl font-bold">${stats.averageOrderValue.toLocaleString(i18n.language)}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Recent orders preview */}
+              <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm">
+                <div className="flex justify-between items-center mb-4 sm:mb-6">
+                  <h3 className="text-base sm:text-lg font-semibold">{t('recentOrders')}</h3>
+                  <button
+                    className="text-indigo-600 hover:text-indigo-800 text-sm sm:text-base"
+                    onClick={() => setActiveTab('orders')}
+                  >
+                    {t('viewAll')}
+                  </button>
+                </div>
+
+                {loading ? (
+                  <div className="flex justify-center py-8">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            {t('orderId')}
+                          </th>
+                          <th className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            {t('customer')}
+                          </th>
+                          <th className="hidden sm:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            {t('date')}
+                          </th>
+                          <th className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            {t('status')}
+                          </th>
+                          <th className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            {t('amount')}
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {orders.slice(0, 5).map(order => (
+                          <tr key={order.id}>
+                            <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                              #{order.id}
+                            </td>
+                            <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap text-sm text-gray-500">
+                              <div className="truncate max-w-[100px] sm:max-w-none">
+                                {order.customer_name || t('guest')}
+                              </div>
+                            </td>
+                            <td className="hidden sm:table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                              {formatDate(order.created_at)}
+                            </td>
+                            <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap">
+                              <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                            ${order.status === 'completed' ? 'bg-green-100 text-green-800' : ''}
+                            ${order.status === 'shipped' ? 'bg-blue-100 text-blue-800' : ''}
+                            ${order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : ''}
+                            ${order.status === 'cancelled' ? 'bg-red-100 text-red-800' : ''}`}>
+                                {t(order.status)}
+                              </span>
+                            </td>
+                            <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap text-sm text-gray-500">
+                              ${formatPrice(order.total_price)}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {activeTab === 'orders' && (
             <div>
@@ -692,9 +793,6 @@ const AdminDashboard = () => {
 
           {activeTab === 'settings' && (
             <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm">
-              {/* settings content */}
-          {activeTab === 'settings' && (
-            <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm">
               <h2 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6">Store Settings</h2>
 
               <div className="space-y-4 sm:space-y-6">
@@ -757,12 +855,8 @@ const AdminDashboard = () => {
               </div>
             </div>
           )}
-            </div>
-          )}
 
           {activeTab === "products" && (
-            <div>
-               {activeTab === "products" && (
             <div>
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-2">
                 <h2 className="text-xl sm:text-2xl font-semibold">Product Management</h2>
@@ -797,37 +891,203 @@ const AdminDashboard = () => {
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
                           {products.map(product => (
-                            <tr key={product.id} className="hover:bg-gray-50">
-                              <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="flex items-center">
-                                  {product.image && (
-                                    <div className="flex-shrink-0 h-10 w-10">
-                                      <img className="h-10 w-10 rounded-full" src={`http://localhost:8000/${product.image}`} alt={product.name} />
+                            <React.Fragment key={product.id}>
+                              <tr className="hover:bg-gray-50">
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                  <div className="flex items-center">
+                                    {product.image && (
+                                      <div className="flex-shrink-0 h-10 w-10">
+                                        <img className="h-10 w-10 rounded-full" src={`http://localhost:8000/${product.image}`} alt={product.title} />
+                                      </div>
+                                    )}
+                                    <div className="ml-4">
+                                      <div className="text-sm font-medium text-gray-900">{product.title}</div>
+                                      <div className="text-sm text-gray-500">{product.category}</div>
                                     </div>
-                                  )}
-                                  <div className="ml-4">
-                                    <div className="text-sm font-medium text-gray-900">{product.name}</div>
-                                    <div className="text-sm text-gray-500">{product.category}</div>
                                   </div>
-                                </div>
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                ${formatPrice(product.price)}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {product.stock || 0}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                <div className="flex space-x-2">
-                                  <button className="text-indigo-600 hover:text-indigo-900">
-                                    <FiEdit size={16} />
-                                  </button>
-                                  <button className="text-red-600 hover:text-red-900">
-                                    <FiTrash2 size={16} />
-                                  </button>
-                                </div>
-                              </td>
-                            </tr>
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                  ${formatPrice(product.price)}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                  {product.qte || 0}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                  <div className="flex space-x-2">
+                                    <button
+                                      className="text-indigo-600 hover:text-indigo-900"
+                                      onClick={() => toggleProductDetails(product.id)}
+                                    >
+                                      {expandedProductId === product.id ? <FiChevronUp size={16} /> : <FiChevronDown size={16} />}
+                                    </button>
+                                    <button className="text-indigo-600 hover:text-indigo-900">
+                                      <FiEdit size={16} />
+                                    </button>
+                                    <button className="text-red-600 hover:text-red-900">
+                                      <FiTrash2 size={16} />
+                                    </button>
+                                  </div>
+                                </td>
+                              </tr>
+
+                              {expandedProductId === product.id && (
+                                <motion.tr
+                                  initial="hidden"
+                                  animate="visible"
+                                  exit="hidden"
+                                  variants={{
+                                    hidden: {
+                                      opacity: 0,
+                                      height: 0,
+                                      transition: {
+                                        duration: 0.3,
+                                        ease: "easeInOut",
+                                        when: "afterChildren" // Wait for children to animate out first
+                                      }
+                                    },
+                                    visible: {
+                                      opacity: 1,
+                                      height: "auto",
+                                      transition: {
+                                        duration: 0.3,
+                                        ease: "easeInOut",
+                                        staggerChildren: 0.05 // Stagger child animations
+                                      }
+                                    }
+                                  }}
+                                  className="bg-gray-50"
+                                >
+                                  <td colSpan="4" className="px-6 py-4 overflow-hidden">
+                                    <motion.div
+                                      className="grid grid-cols-1 md:grid-cols-2 gap-6"
+                                      initial={{ opacity: 0 }}
+                                      animate={{ opacity: 1 }}
+                                      exit={{ opacity: 0 }}
+                                      transition={{ duration: 0.2 }}
+                                    >
+                                      {/* Left Column - Product Details */}
+                                      <motion.div
+                                        initial={{ x: -20, opacity: 0 }}
+                                        animate={{ x: 0, opacity: 1 }}
+                                        exit={{ x: -20, opacity: 0 }}
+                                        transition={{ duration: 0.3 }}
+                                      >
+                                        <h3 className="text-lg font-medium mb-2">Product Details</h3>
+                                        <div className="space-y-2">
+                                          <p><span className="font-medium">Description:</span> {product.description}</p>
+                                          <p><span className="font-medium">Size:</span> {product.size || 'N/A'}</p>
+                                          <p><span className="font-medium">Category:</span> {product.category || 'N/A'}</p>
+                                        </div>
+                                      </motion.div>
+
+                                      {/* Right Column - Product Images */}
+                                      <motion.div
+                                        initial={{ x: 20, opacity: 0 }}
+                                        animate={{ x: 0, opacity: 1 }}
+                                        exit={{ x: 20, opacity: 0 }}
+                                        transition={{ duration: 0.3 }}
+                                      >
+                                        <div className="flex justify-between items-center mb-2">
+                                          <h3 className="text-lg font-medium">Product Images</h3>
+                                          <motion.label
+                                            whileHover={{ scale: 1.05 }}
+                                            whileTap={{ scale: 0.95 }}
+                                            className="inline-flex items-center px-3 py-1 bg-indigo-600 text-white rounded-md cursor-pointer hover:bg-indigo-700"
+                                          >
+                                            <FiPlus className="mr-1" />
+                                            Add Images
+                                            <input
+                                              type="file"
+                                              className="hidden"
+                                              multiple
+                                              accept="image/*"
+                                              onChange={(e) => handleImageUpload(e, product.id)}
+                                            />
+                                          </motion.label>
+                                        </div>
+
+                                        {imageUploading && (
+                                          <motion.div
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            exit={{ opacity: 0 }}
+                                            className="mb-2 text-sm text-gray-500"
+                                          >
+                                            Uploading images...
+                                          </motion.div>
+                                        )}
+
+                                        <motion.div
+                                          className="grid grid-cols-3 gap-2"
+                                          variants={{
+                                            hidden: { opacity: 0 },
+                                            visible: {
+                                              opacity: 1,
+                                              transition: {
+                                                staggerChildren: 0.1
+                                              }
+                                            }
+                                          }}
+                                        >
+                                          {product.image && (
+                                            <motion.div
+                                              className="relative"
+                                              variants={{
+                                                hidden: { opacity: 0, y: 10 },
+                                                visible: { opacity: 1, y: 0 }
+                                              }}
+                                            >
+                                              <img
+                                                src={`http://localhost:8000/${product.image}`}
+                                                alt="Main product"
+                                                className="w-full h-24 object-cover rounded"
+                                              />
+                                              <span className="absolute bottom-1 left-1 bg-black bg-opacity-50 text-white text-xs px-1 rounded">Main</span>
+                                            </motion.div>
+                                          )}
+
+                                          {selectedProductImages.map((image, index) => (
+                                            <motion.div
+                                              key={index}
+                                              className="relative"
+                                              variants={{
+                                                hidden: { opacity: 0, y: 10 },
+                                                visible: { opacity: 1, y: 0 }
+                                              }}
+                                            >
+                                              <img
+                                                src={`http://localhost:8000/${image.image_path}`}
+                                                alt={`Product ${index + 1}`}
+                                                className="w-full h-24 object-cover rounded"
+                                              />
+                                              <motion.button
+                                                whileHover={{ scale: 1.1 }}
+                                                whileTap={{ scale: 0.9 }}
+                                                onClick={() => deleteImage(product.id, image.id)}
+                                                className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center"
+                                              >
+                                                ×
+                                              </motion.button>
+                                            </motion.div>
+                                          ))}
+                                        </motion.div>
+
+                                        {selectedProductImages.length === 0 && !product.image && (
+                                          <motion.p
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            exit={{ opacity: 0 }}
+                                            className="text-sm text-gray-500"
+                                          >
+                                            No additional images available
+                                          </motion.p>
+                                        )}
+                                      </motion.div>
+                                    </motion.div>
+                                  </td>
+                                </motion.tr>
+                              )}
+                            </React.Fragment>
                           ))}
                         </tbody>
                       </table>
@@ -839,8 +1099,6 @@ const AdminDashboard = () => {
                   )}
                 </div>
               )}
-            </div>
-          )}
             </div>
           )}
         </main>

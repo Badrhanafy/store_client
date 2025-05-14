@@ -1,14 +1,57 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams, Link } from 'react-router-dom';
-import { FiShoppingBag, FiHeart, FiUser, FiMessageSquare, FiStar, FiChevronRight, FiCheck, FiPlus, FiMinus, FiCreditCard, FiTruck, FiImage } from 'react-icons/fi';
+import { FiShoppingBag, FiHeart, FiUser, FiMessageSquare, FiStar, FiChevronRight, FiCheck, FiPlus, FiMinus, FiCreditCard, FiTruck, FiImage, FiX, FiCheckCircle, FiAlertCircle } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const fontClasses = {
   heading: "font-['Playfair_Display'] font-bold",
   subheading: "font-['Montserrat'] font-medium",
   body: "font-['Open_Sans']",
   nav: "font-['Raleway'] font-medium"
+};
+
+// Custom Toast Component
+const CustomToast = ({ type, message }) => {
+  const icon = {
+    success: <FiCheckCircle className="text-green-500 text-xl" />,
+    error: <FiAlertCircle className="text-red-500 text-xl" />,
+    info: <FiAlertCircle className="text-blue-500 text-xl" />,
+    warning: <FiAlertCircle className="text-yellow-500 text-xl" />
+  }[type];
+
+  return (
+    <div className="flex items-start">
+      <div className="flex-shrink-0 pt-0.5">
+        {icon}
+      </div>
+      <div className="ml-3">
+        <p className={`${fontClasses.body} text-sm text-gray-800`}>{message}</p>
+      </div>
+    </div>
+  );
+};
+
+const showToast = (type, message) => {
+  toast[type](<CustomToast type={type} message={message} />, {
+    position: "top-right",
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+    className: '!bg-white !text-gray-800 !shadow-md !rounded-lg !border !border-gray-200',
+    bodyClassName: `${fontClasses.body}`,
+    progressClassName: {
+      success: '!bg-green-500',
+      error: '!bg-red-500',
+      info: '!bg-blue-500',
+      warning: '!bg-yellow-500'
+    }[type]
+  });
 };
 
 const ReviewCard = ({ review }) => {
@@ -414,7 +457,7 @@ const ProductDetailsForm = ({
 
             <motion.div
               whileHover={{ scale: 1.01 }}
-              onClick={() => alert('Online payment coming soon!')}
+              onClick={() => showToast('info', 'Online payment option coming soon!')}
               className={`flex items-center p-4 border-2 rounded-lg cursor-pointer ${
                 paymentMethod === 'online' ? 'border-indigo-600 bg-indigo-50' : 'border-gray-200 hover:border-gray-300 opacity-60'
               }`}
@@ -510,6 +553,7 @@ export default function ProductDetails() {
       })
       .catch(error => {
         console.error('Error fetching data:', error);
+        showToast('error', 'Failed to load product details. Please try again later.');
         setIsLoading(false);
       });
   }, [id]);
@@ -539,10 +583,20 @@ export default function ProductDetails() {
 
       await axios.post('http://localhost:8000/api/orders', orderData);
       setOrderSuccess(true);
-      setTimeout(() => setOrderSuccess(false), 3000);
+      showToast('success', 'Order placed successfully!');
+      
+      // Reset form after successful order
+      setTimeout(() => {
+        setOrderSuccess(false);
+        setQuantity(1);
+        setTaille('M');
+        setname('');
+        setPhone('');
+        setAddress('');
+      }, 3000);
     } catch (error) {
       console.error('Error placing order:', error);
-      alert('Error placing order');
+      showToast('error', 'Failed to place order. Please check your details and try again.');
     }
   };
 
@@ -576,10 +630,10 @@ export default function ProductDetails() {
       setRating(5);
       setShowReviewForm(false);
       
-      alert(response.data.message);
+      showToast('success', 'Thank you for your review!');
     } catch (error) {
       console.error('Error submitting review:', error);
-      alert("We couldn't submit your review. Please try again later.");
+      showToast('error', "We couldn't submit your review. Please try again later.");
     }
   };
 
@@ -597,6 +651,7 @@ export default function ProductDetails() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+      <ToastContainer />
       <div className="max-w-7xl mx-auto">
         {/* Breadcrumbs */}
         <div className={`${fontClasses.body} flex items-center text-sm text-gray-600 mb-6`}>

@@ -16,7 +16,10 @@ import Kobiyat from "../pages/Kobiyat"
 import Casketat from "../pages/casketat"
 import AdminLogin from "../pages/admin/AdminLogin"
 import AdminDashboard from "../pages/admin/Dashboard"
-import ProductsTab from "../pages/admin/ProductsTab"
+import ProductList from "../pages/products"
+import Products from "../pages/admin/Products"
+import OrdersComponent from "../pages/admin/Orders"
+import SettingsComponent from "../pages/admin/Settings"
 export const router = createBrowserRouter([
   {
     element : <Layout/>,
@@ -53,10 +56,10 @@ export const router = createBrowserRouter([
         path : '*',
         element : <Notfound/>
       },
-      {
+     /*  {
         path : '/admin/AllProducts',
         element : <AllProducts/>
-      },
+      }, */
        {
         path : '/Fortis/Contacts',
         element : <ContactPage/>
@@ -81,9 +84,17 @@ export const router = createBrowserRouter([
         path:"/admin/dashboard",
         element: <AdminDashboard/>
       },
+     {
+      path:"/admin/AllProductsFortest",
+      element:<Products/>
+     },
       {
-        path:"/admin/Products",
-        element: <ProductsTab/>
-      }
+      path:"/admin/Orders",
+      element:<OrdersComponent/>
+     },
+    /*  {
+      path:"/admin/settings",
+      element:<SettingsComponent/>
+     } */
   /// no kida3 h hhh
 ])

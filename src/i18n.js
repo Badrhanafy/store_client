@@ -110,7 +110,8 @@ const resources = {
         emptyCart: "Your cart is empty!",
         orderSuccess: "Order sent successfully! ✅",
         orderError: "Failed to send order ❌"
-      }
+      },
+      
     },
     dashboard: 'Dashboard',
       orders: 'Orders',
@@ -141,11 +142,14 @@ const resources = {
       email: 'Email',
       address: 'Address',
       date: 'Date',
+
     },
+    "submitOrder":"submitOrder"
     
   },
   fr: {
     translation: {
+      "submitOrder":"lancer la commande",
       "Home": "Accueil",
       "Login": "Connexion",
       "Contact": "Contact",
@@ -283,6 +287,7 @@ const resources = {
   },
   ar: {
     translation: {
+      "submitOrder":"ارسل الطلب",
       "Home": "الرئيسية",
       "Login": "تسجيل الدخول",
       "Contact": "اتصل بنا",
