@@ -43,7 +43,7 @@ function AdminLogin() {
             style={{ width: '100%', padding: '8px' }}
           />
         </div>
-
+{/* just for github save */}
         <div style={{ marginBottom: '10px' }}>
           <label>Password:</label>
           <input
