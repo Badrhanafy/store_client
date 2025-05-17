@@ -156,10 +156,10 @@ const HomePage = () => {
 
 
       {/* Newsletter Section */}
-      <section className="py-16 bg-indigo-600 text-white">
+      <section className="py-16 bg-indigo-200 text-white">
         <div className="container mx-auto px-6 text-center">
-          <h2 className={`${fontClasses.heading} text-3xl mb-4`}>{t("home.newsletter.title")}</h2>
-          <p className={`${fontClasses.body} max-w-lg mx-auto mb-8`}>
+          <h2 className={`${fontClasses.heading} text-3xl text-black mb-4`}>{t("home.newsletter.title")}</h2>
+          <p className={`${fontClasses.body} max-w-lg mx-auto mb-8 text-gray-600`}>
             {t("home.newsletter.subtitle")}
           </p>
           <div className="flex flex-col sm:flex-row max-w-md mx-auto gap-2">
@@ -168,7 +168,7 @@ const HomePage = () => {
               placeholder={t("home.newsletter.placeholder")}
               className="flex-grow px-4 py-3 rounded-full text-gray-800 focus:outline-none"
             />
-            <button className={`${fontClasses.body} bg-black hover:bg-gray-900 text-white px-6 py-3 rounded-full transition-colors duration-300`}>
+            <button className={`${fontClasses.body} bg-indigo-500 hover:bg-indigo-700 text-white px-6 py-3 rounded-full transition-colors duration-300`}>
               {t("home.newsletter.button")}
             </button>
           </div>

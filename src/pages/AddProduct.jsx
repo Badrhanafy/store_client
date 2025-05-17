@@ -79,50 +79,62 @@ export default function AddProduct() {
     });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  setIsSubmitting(true);
 
-    const formDataToSend = new FormData();
-    Object.keys(formData).forEach(key => {
-      if (key === 'colors' || key === 'sizes') {
-        formData[key].forEach(item => formDataToSend.append(key, item));
-      } else if (formData[key] !== null) {
-        formDataToSend.append(key, formData[key]);
-      }
+  const formDataToSend = new FormData();
+  
+  // Append all fields except arrays
+  formDataToSend.append('title', formData.title);
+  formDataToSend.append('description', formData.description);
+  formDataToSend.append('price', formData.price);
+  formDataToSend.append('qte', formData.qte);
+  formDataToSend.append('category', formData.category);
+  formDataToSend.append('image', formData.image);
+
+  // Append each color and size individually
+  formData.colors.forEach(color => {
+    formDataToSend.append('colors[]', color);
+  });
+
+  formData.sizes.forEach(size => {
+    formDataToSend.append('sizes[]', size);
+  });
+
+  try {
+    const res = await axios.post('http://localhost:8000/api/products', formDataToSend, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        'Accept': 'application/json',
+      },
     });
-
-    try {
-      const res = await axios.post('http://localhost:8000/api/products', formDataToSend, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-          'Accept': 'application/json',
-        },
-      });
-      console.log('Product added:', res.data);
-      setSuccess(true);
-      
-      // Reset form
-      setFormData({
-        title: '',
-        description: '',
-        price: '',
-        qte: '',
-        image: null,
-        category: '',
-        colors: [],
-        sizes: []
-      });
-      setPreviewImage(null);
-      
-      setTimeout(() => setSuccess(false), 3000);
-    } catch (err) {
-      console.error(err);
-      alert('Error adding product!');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+    console.log('Product added:', res.data);
+    setSuccess(true);
+    
+    // Reset form
+    setFormData({
+      title: '',
+      description: '',
+      price: '',
+      qte: '',
+      image: null,
+      category: '',
+      colors: [],
+      sizes: []
+    });
+    setPreviewImage(null);
+    setNewColor('');
+    setNewSize('');
+    
+    setTimeout(() => setSuccess(false), 3000);
+  } catch (err) {
+    console.error('Error:', err.response?.data || err.message);
+    alert('Error adding product! Please check the console for details.');
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
