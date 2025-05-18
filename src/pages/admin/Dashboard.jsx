@@ -1,9 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FiShoppingCart, FiUsers, FiDollarSign, FiPrinter, FiPieChart, FiSettings, FiLogOut, FiMenu, FiX, FiSearch, FiEdit, FiTrash2, FiPlus, FiImage, FiChevronDown, FiChevronUp } from 'react-icons/fi';
+import { 
+  FiShoppingCart, FiUsers, FiDollarSign, FiPrinter, FiPieChart, 
+  FiSettings, FiLogOut, FiMenu, FiX, FiSearch, FiEdit, FiTrash2, 
+  FiPlus, FiImage, FiChevronDown, FiChevronUp, FiUpload, FiHash, 
+  FiType, FiPlusCircle 
+} from 'react-icons/fi';
 import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
+
+// Font classes consistent with your store
+const fontClasses = {
+  heading: "font-['Playfair_Display'] font-bold",
+  subheading: "font-['Montserrat'] font-medium",
+  body: "font-['Open_Sans']",
+  nav: "font-['Raleway'] font-medium"
+};
+
 const AdminDashboard = () => {
   const { t, i18n } = useTranslation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -25,16 +39,50 @@ const AdminDashboard = () => {
   const [expandedProductId, setExpandedProductId] = useState(null);
   const [selectedProductImages, setSelectedProductImages] = useState([]);
   const [imageUploading, setImageUploading] = useState(false);
+  const [showAddProduct, setShowAddProduct] = useState(false);
+
+  // Product form state
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    price: '',
+    qte: '',
+    image: null,
+    category: '',
+    colors: [],
+    sizes: []
+  });
+  const [previewImage, setPreviewImage] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [newColor, setNewColor] = useState('');
+  const [newSize, setNewSize] = useState('');
 
   // API base URL
-  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
+  const API_URL = 'http://localhost:8000/api';
+
+  // Configure axios
+  axios.defaults.withCredentials = true;
 
   // Change language
   const changeLanguage = (lng) => {
     i18n.changeLanguage(lng);
     document.dir = lng === 'ar' ? 'rtl' : 'ltr';
   };
-  // Add these animation variants at the top of your component
+
+  // Get CSRF token
+  useEffect(() => {
+    const getCsrfToken = async () => {
+      try {
+        await axios.get('http://localhost:8000/sanctum/csrf-cookie');
+      } catch (error) {
+        console.error('Error fetching CSRF token:', error);
+      }
+    };
+    getCsrfToken();
+  }, []);
+
+  // Animation variants
   const expandVariants = {
     hidden: {
       opacity: 0,
@@ -65,7 +113,8 @@ const AdminDashboard = () => {
       }
     }
   };
-  // Safe number formatting function
+
+  // Format price
   const formatPrice = (price) => {
     const num = typeof price === 'string' ? parseFloat(price) : price;
     return isNaN(num) ? '0.00' : num.toFixed(2);
@@ -116,7 +165,7 @@ const AdminDashboard = () => {
     }
 
     try {
-      await axios.post(`http://localhost:8000/api/admin/products/${productId}/add-images`, formData, {
+      await axios.post(`${API_URL}/admin/products/${productId}/add-images`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -172,7 +221,8 @@ const AdminDashboard = () => {
       setError(t('failedToFetchProducts'));
     }
   };
-  //////////delete image
+
+  // Delete image
   const deleteImage = async (productId, imageId) => {
     try {
       const response = await axios.delete(`${API_URL}/products/${productId}/images/${imageId}`);
@@ -184,9 +234,9 @@ const AdminDashboard = () => {
       toast.error(error.response?.data?.message || 'Failed to delete image');
     }
   };
+
   // Calculate dashboard statistics
   const calculateStats = (orders) => {
-    // Calculate total sales only for completed orders
     const totalSales = orders.reduce((sum, order) => {
       if (order.status === 'completed') {
         const price = typeof order.total_price === 'string'
@@ -200,7 +250,6 @@ const AdminDashboard = () => {
     const pendingOrders = orders.filter(order => order.status === 'pending').length;
     const completedOrders = orders.filter(order => order.status === 'completed').length;
 
-    // Calculate average order value only for completed orders
     const averageOrderValue = completedOrders > 0
       ? totalSales / completedOrders
       : 0;
@@ -299,6 +348,111 @@ const AdminDashboard = () => {
     };
   }, [mobileSidebarOpen]);
 
+  // Product form handlers
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value
+    });
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFormData({ ...formData, image: file });
+      setPreviewImage(URL.createObjectURL(file));
+    }
+  };
+
+  const addColor = () => {
+    if (newColor && !formData.colors.includes(newColor)) {
+      setFormData({
+        ...formData,
+        colors: [...formData.colors, newColor]
+      });
+      setNewColor('');
+    }
+  };
+
+  const removeColor = (colorToRemove) => {
+    setFormData({
+      ...formData,
+      colors: formData.colors.filter(color => color !== colorToRemove)
+    });
+  };
+
+  const addSize = () => {
+    if (newSize && !formData.sizes.includes(newSize)) {
+      setFormData({
+        ...formData,
+        sizes: [...formData.sizes, newSize]
+      });
+      setNewSize('');
+    }
+  };
+
+  const removeSize = (sizeToRemove) => {
+    setFormData({
+      ...formData,
+      sizes: formData.sizes.filter(size => size !== sizeToRemove)
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    const formDataToSend = new FormData();
+    
+    // Append all fields
+    formDataToSend.append('title', formData.title);
+    formDataToSend.append('description', formData.description);
+    formDataToSend.append('price', formData.price);
+    formDataToSend.append('qte', formData.qte);
+    formDataToSend.append('category', formData.category);
+    formDataToSend.append('image', formData.image);
+
+    // Convert arrays to JSON strings before appending
+    formDataToSend.append('sizes', JSON.stringify(formData.sizes));
+    formDataToSend.append('colors', JSON.stringify(formData.colors));
+
+    try {
+      const res = await axios.post(`${API_URL}/products`, formDataToSend, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Accept': 'application/json',
+        },
+        withCredentials: true,
+      });
+      
+      console.log('Product added:', res.data);
+      setSuccess(true);
+      fetchProducts(); // Refresh products list
+      
+      // Reset form
+      setFormData({
+        title: '',
+        description: '',
+        price: '',
+        qte: '',
+        image: null,
+        category: '',
+        colors: [],
+        sizes: []
+      });
+      setPreviewImage(null);
+      
+      setTimeout(() => setSuccess(false), 3000);
+      setShowAddProduct(false); // Close the add product form
+    } catch (err) {
+      console.error('Error:', err.response?.data || err.message);
+      toast.error(`Error adding product: ${err.response?.data?.message || err.message}`);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className={`flex h-screen bg-gray-100 ${i18n.language === 'ar' ? 'text-right' : 'text-left'}`}>
       <Toaster
@@ -337,6 +491,7 @@ const AdminDashboard = () => {
           },
         }}
       />
+      
       {/* Mobile sidebar backdrop */}
       {mobileSidebarOpen && (
         <div
@@ -860,17 +1015,316 @@ const AdminDashboard = () => {
             <div>
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-2">
                 <h2 className="text-xl sm:text-2xl font-semibold">Product Management</h2>
-                <div className="relative w-full sm:w-64">
-                  <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Search products..."
-                    className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
+                <div className="flex items-center space-x-3">
+                  <div className="relative w-full sm:w-64">
+                    <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Search products..."
+                      className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                  </div>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setShowAddProduct(true)}
+                    className="bg-indigo-600 text-white px-4 py-2 rounded-lg flex items-center"
+                  >
+                    <FiPlusCircle className="mr-2" />
+                    Add Product
+                  </motion.button>
                 </div>
               </div>
+
+              {/* Add Product Form */}
+              {showAddProduct && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 20 }}
+                  className="bg-white p-6 rounded-xl shadow-sm mb-6"
+                >
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-xl font-semibold">Add New Product</h3>
+                    <button 
+                      onClick={() => setShowAddProduct(false)}
+                      className="text-gray-500 hover:text-gray-700"
+                    >
+                      <FiX size={24} />
+                    </button>
+                  </div>
+
+                  {success && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: -20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4 rounded"
+                    >
+                      <p className="font-medium">Product added successfully!</p>
+                    </motion.div>
+                  )}
+
+                  <form onSubmit={handleSubmit}>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* Left Column */}
+                      <div>
+                        {/* Title */}
+                        <div className="mb-6">
+                          <label className="block text-gray-700 text-sm mb-2" htmlFor="title">
+                            Product Title
+                          </label>
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                              <FiType className="text-gray-400" />
+                            </div>
+                            <input
+                              id="title"
+                              name="title"
+                              type="text"
+                              required
+                              value={formData.title}
+                              onChange={handleChange}
+                              className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                              placeholder="e.g. Premium Cotton T-Shirt"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Description */}
+                        <div className="mb-6">
+                          <label className="block text-gray-700 text-sm mb-2" htmlFor="description">
+                            Description
+                          </label>
+                          <textarea
+                            id="description"
+                            name="description"
+                            required
+                            value={formData.description}
+                            onChange={handleChange}
+                            className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                            rows="4"
+                            placeholder="Detailed product description..."
+                          />
+                        </div>
+
+                        {/* Category */}
+                        <div className="mb-6">
+                          <label className="block text-gray-700 text-sm mb-2" htmlFor="category">
+                            Category
+                          </label>
+                          <select
+                            id="category"
+                            name="category"
+                            value={formData.category}
+                            onChange={handleChange}
+                            className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                          >
+                            <option value="">Select a category</option>
+                            <option value="men">Men's Clothing</option>
+                            <option value="women">Women's Clothing</option>
+                            <option value="accessories">Accessories</option>
+                            <option value="footwear">Footwear</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      {/* Right Column */}
+                      <div>
+                        {/* Price */}
+                        <div className="mb-6">
+                          <label className="block text-gray-700 text-sm mb-2" htmlFor="price">
+                            Price (DH)
+                          </label>
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                              <FiDollarSign className="text-gray-400" />
+                            </div>
+                            <input
+                              id="price"
+                              name="price"
+                              type="number"
+                              required
+                              value={formData.price}
+                              onChange={handleChange}
+                              className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                              placeholder="0.00"
+                              min="0"
+                              step="0.01"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Quantity */}
+                        <div className="mb-6">
+                          <label className="block text-gray-700 text-sm mb-2" htmlFor="qte">
+                            Quantity
+                          </label>
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                              <FiHash className="text-gray-400" />
+                            </div>
+                            <input
+                              id="qte"
+                              name="qte"
+                              type="number"
+                              required
+                              value={formData.qte}
+                              onChange={handleChange}
+                              className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                              placeholder="0"
+                              min="0"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Image Upload */}
+                        <div className="mb-6">
+                          <label className="block text-gray-700 text-sm mb-2">
+                            Product Image
+                          </label>
+                          <div className="flex items-center justify-center w-full">
+                            <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">
+                              {previewImage ? (
+                                <img src={previewImage} alt="Preview" className="w-full h-full object-cover rounded-lg" />
+                              ) : (
+                                <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                                  <FiUpload className="w-8 h-8 text-gray-400 mb-3" />
+                                  <p className="text-sm text-gray-500">Click to upload or drag and drop</p>
+                                  <p className="text-xs text-gray-500">PNG, JPG, JPEG (Max. 5MB)</p>
+                                </div>
+                              )}
+                              <input 
+                                id="image" 
+                                name="image" 
+                                type="file" 
+                                className="hidden" 
+                                onChange={handleImageChange} 
+                                accept="image/*" 
+                                required 
+                              />
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Color Selection */}
+                    <div className="mb-6">
+                      <label className="block text-gray-700 text-sm mb-2">
+                        Available Colors
+                      </label>
+                      <div className="flex flex-wrap items-center gap-2 mb-2">
+                        {formData.colors.map((color, index) => (
+                          <motion.div 
+                            key={index}
+                            whileHover={{ scale: 1.05 }}
+                            className="flex items-center px-3 py-1 rounded-full bg-gray-100 text-sm"
+                          >
+                            <div 
+                              className="w-4 h-4 rounded-full mr-2 border border-gray-300"
+                              style={{ backgroundColor: color }}
+                            />
+                            {color}
+                            <button 
+                              type="button"
+                              onClick={() => removeColor(color)}
+                              className="ml-2 text-gray-500 hover:text-red-500"
+                            >
+                              <FiX size={14} />
+                            </button>
+                          </motion.div>
+                        ))}
+                      </div>
+                      <div className="flex">
+                        <input
+                          type="text"
+                          value={newColor}
+                          onChange={(e) => setNewColor(e.target.value)}
+                          placeholder="Add color (e.g. #FF0000 or 'Red')"
+                          className="flex-grow px-3 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                        />
+                        <motion.button
+                          type="button"
+                          onClick={addColor}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          className="bg-indigo-600 text-white px-4 py-2 rounded-r-lg"
+                        >
+                          <FiPlus />
+                        </motion.button>
+                      </div>
+                    </div>
+
+                    {/* Size Selection */}
+                    <div className="mb-8">
+                      <label className="block text-gray-700 text-sm mb-2">
+                        Available Sizes
+                      </label>
+                      <div className="flex flex-wrap items-center gap-2 mb-2">
+                        {formData.sizes.map((size, index) => (
+                          <motion.div 
+                            key={index}
+                            whileHover={{ scale: 1.05 }}
+                            className="flex items-center px-3 py-1 rounded-full bg-gray-100 text-sm"
+                          >
+                            {size}
+                            <button 
+                              type="button"
+                              onClick={() => removeSize(size)}
+                              className="ml-2 text-gray-500 hover:text-red-500"
+                            >
+                              <FiX size={14} />
+                            </button>
+                          </motion.div>
+                        ))}
+                      </div>
+                      <div className="flex">
+                        <input
+                          type="text"
+                          value={newSize}
+                          onChange={(e) => setNewSize(e.target.value)}
+                          placeholder="Add size (e.g. S, M, L, XL)"
+                          className="flex-grow px-3 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                        />
+                        <motion.button
+                          type="button"
+                          onClick={addSize}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          className="bg-indigo-600 text-white px-4 py-2 rounded-r-lg"
+                        >
+                          <FiPlus />
+                        </motion.button>
+                      </div>
+                    </div>
+
+                    {/* Submit Button */}
+                    <div className="flex justify-end">
+                      <motion.button
+                        type="submit"
+                        disabled={isSubmitting}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        className="bg-indigo-600 hover:bg-indigo-700 text-white py-3 px-8 rounded-lg flex items-center transition-colors duration-300"
+                      >
+                        {isSubmitting ? (
+                          <>
+                            <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Processing...
+                          </>
+                        ) : (
+                          'Add Product'
+                        )}
+                      </motion.button>
+                    </div>
+                  </form>
+                </motion.div>
+              )}
 
               {loading ? (
                 <div className="flex justify-center py-8">
@@ -942,7 +1396,7 @@ const AdminDashboard = () => {
                                       transition: {
                                         duration: 0.3,
                                         ease: "easeInOut",
-                                        when: "afterChildren" // Wait for children to animate out first
+                                        when: "afterChildren"
                                       }
                                     },
                                     visible: {
@@ -951,7 +1405,7 @@ const AdminDashboard = () => {
                                       transition: {
                                         duration: 0.3,
                                         ease: "easeInOut",
-                                        staggerChildren: 0.05 // Stagger child animations
+                                        staggerChildren: 0.05
                                       }
                                     }
                                   }}
@@ -975,7 +1429,8 @@ const AdminDashboard = () => {
                                         <h3 className="text-lg font-medium mb-2">Product Details</h3>
                                         <div className="space-y-2">
                                           <p><span className="font-medium">Description:</span> {product.description}</p>
-                                          <p><span className="font-medium">Size:</span> {product.size || 'N/A'}</p>
+                                          <p><span className="font-medium">Colors:</span> {product.colors?.join(', ') || 'N/A'}</p>
+                                          <p><span className="font-medium">Sizes:</span> {product.sizes?.join(', ') || 'N/A'}</p>
                                           <p><span className="font-medium">Category:</span> {product.category || 'N/A'}</p>
                                         </div>
                                       </motion.div>
