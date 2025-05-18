@@ -597,7 +597,8 @@ const AdminDashboard = () => {
                 className={`w-full flex items-center p-3 rounded-lg ${activeTab === 'dashboard' ? 'bg-indigo-700' : 'hover:bg-indigo-700'}`}
                 onClick={() => {
                   setActiveTab('dashboard');
-                  setMobileSidebarOpen(false);
+                  setMobileSidebarOpen(false)
+                  setSidebarOpen(false);;
                 }}
               >
                 <FiPieChart className="mr-3" />
@@ -972,7 +973,7 @@ const AdminDashboard = () => {
                                     className="text-indigo-600 hover:text-indigo-900"
                                     onClick={() => viewOrderDetails(order)}
                                   >
-                                    <FiEdit size={16} />
+                                    <FiMoreHorizontal size={16} />
                                   </button>
                                 </Tooltip>
 
@@ -1745,7 +1746,7 @@ const AdminDashboard = () => {
                             <td className="px-6 py-4 whitespace-nowrap">
                               <div className="flex items-center">
                                 <div className="ml-4">
-                                  <div className="text-sm font-medium text-gray-900">{item.product_name}</div>
+                                  <div className="text-sm font-medium text-gray-900">{item.title}</div>
                                   <div className="text-sm text-gray-500">
                                     {item.size && <span className="inline-block bg-gray-100 rounded-full px-2 py-1 text-xs mr-2">Size: {item.size}</span>}
                                     {item.color && <span className="inline-block bg-gray-100 rounded-full px-2 py-1 text-xs">Color: {item.color}</span>}
@@ -1942,7 +1943,7 @@ const AdminDashboard = () => {
                             <td className="px-6 py-4 whitespace-nowrap">
                               <div className="flex items-center">
                                 <div className="ml-4">
-                                  <div className="text-sm font-medium text-gray-900">{item.product_name}</div>
+                                  <div className="text-sm font-medium text-gray-900">{item.product.title||selectedOrder.order_items[0].product.title}</div>
                                   {item.size && (
                                     <div className="text-sm text-gray-500">{t('size')}: {item.size}</div>
                                   )}
