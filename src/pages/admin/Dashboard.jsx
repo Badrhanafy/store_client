@@ -413,7 +413,37 @@ const AdminDashboard = () => {
       sizes: formData.sizes.filter(size => size !== sizeToRemove)
     });
   };
+const modalVariants = {
+  hidden: {
+    opacity: 0,
+    y: -20,
+    transition: {
+      duration: 0.3,
+      ease: "easeInOut"
+    }
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.3,
+      ease: "easeInOut"
+    }
+  },
+  exit: {
+    opacity: 0,
+    y: 20,
+    transition: {
+      duration: 0.2,
+      ease: "easeInOut"
+    }
+  }
+};
 
+const backdropVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 0.75 }
+};
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -1423,7 +1453,7 @@ const AdminDashboard = () => {
                                   }}
                                   className="bg-gray-50"
                                 >
-                                  <td colSpan="4" className="px-6 py-4 overflow-hidden">
+                                  <td colSpan="4" className="px-6 py-4 overflow-hidden bg-indigo-50">
                                     <motion.div
                                       className="grid grid-cols-1 md:grid-cols-2 gap-6"
                                       initial={{ opacity: 0 }}
@@ -1573,61 +1603,89 @@ const AdminDashboard = () => {
 
       {/* Invoice Modal */}
 
-      {viewOrderModal && selectedOrderDetails && (
-        <div className="fixed inset-0 z-50 overflow-y-auto">
-          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            {/* Background overlay */}
-            <div className="fixed inset-0 transition-opacity" aria-hidden="true">
-              <div className="absolute inset-0 bg-gray-900 bg-opacity-75" onClick={() => setViewOrderModal(false)}></div>
-            </div>
+      {viewOrderModal && (
+        <AnimatePresence>
+          {/* Backdrop with fade animation */}
+          <motion.div
+            className="fixed inset-0 z-50 bg-black"
+            variants={backdropVariants}
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+            onClick={() => setViewOrderModal(false)}
+          ></motion.div>
 
-            {/* Modal content */}
-            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
-              <div className="bg-white px-6 py-4">
+          {/* Modal container - centered with smooth slide-up animation */}
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <motion.div
+              className="w-full max-w-4xl bg-white rounded-xl shadow-2xl overflow-hidden"
+              variants={modalVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+            >
+              {/* Modern header with gradient */}
+              <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-6">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h2 className="text-2xl font-bold text-gray-800">Order Details</h2>
-                    <p className="text-gray-600">Order #{selectedOrderDetails.id}</p>
+                    <h2 className="text-2xl font-bold text-white">Order Details</h2>
+                    <p className="text-indigo-100">Order #{selectedOrderDetails?.id}</p>
                   </div>
                   <button
                     onClick={() => setViewOrderModal(false)}
-                    className="text-gray-400 hover:text-gray-500"
+                    className="text-white hover:text-indigo-200 transition-colors"
                   >
                     <FiX size={24} />
                   </button>
                 </div>
               </div>
 
-              <div className="px-6 py-4 space-y-6">
-                {/* Customer Information */}
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-3">Customer Information</h3>
+              {/* Content with smooth scroll */}
+              <div className="max-h-[80vh] overflow-y-auto p-6 space-y-6">
+                {/* Customer Card with subtle shadow */}
+                <motion.div
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.1 }}
+                  className="bg-white rounded-lg border border-gray-100 shadow-sm p-5"
+                >
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                    <FiUsers className="mr-2 text-indigo-500" />
+                    Customer Information
+                  </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
+                    <div className="space-y-1">
                       <p className="text-sm text-gray-500">Name</p>
-                      <p className="font-medium">{selectedOrderDetails.customer_name || 'Guest'}</p>
+                      <p className="font-medium text-gray-800">{selectedOrderDetails?.customer_name || 'Guest'}</p>
                     </div>
-                    <div>
+                    <div className="space-y-1">
                       <p className="text-sm text-gray-500">Email</p>
-                      <p className="font-medium">{selectedOrderDetails.email || 'N/A'}</p>
+                      <p className="font-medium text-gray-800">{selectedOrderDetails?.email || 'N/A'}</p>
                     </div>
-                    <div>
+                    <div className="space-y-1">
                       <p className="text-sm text-gray-500">Phone</p>
-                      <p className="font-medium">{selectedOrderDetails.phone || 'N/A'}</p>
+                      <p className="font-medium text-gray-800">{selectedOrderDetails?.phone || 'N/A'}</p>
                     </div>
-                    <div>
+                    <div className="space-y-1">
                       <p className="text-sm text-gray-500">Address</p>
-                      <p className="font-medium">{selectedOrderDetails.address || 'N/A'}</p>
+                      <p className="font-medium text-gray-800">{selectedOrderDetails?.address || 'N/A'}</p>
                     </div>
                   </div>
-                </div>
+                </motion.div>
 
-                {/* Order Items */}
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-800 mb-3">Order Items</h3>
-                  <div className="overflow-hidden border border-gray-200 rounded-lg">
+                {/* Order Items - Modern table with hover effects */}
+                <motion.div
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                    <FiShoppingCart className="mr-2 text-indigo-500" />
+                    Order Items
+                  </h3>
+                  <div className="border border-gray-200 rounded-xl overflow-hidden">
                     <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-100">
+                      <thead className="bg-gray-50">
                         <tr>
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
@@ -1636,15 +1694,21 @@ const AdminDashboard = () => {
                         </tr>
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-200">
-                        {selectedOrderDetails.order_items?.map((item, index) => (
-                          <tr key={index} className="hover:bg-gray-50">
+                        {selectedOrderDetails?.order_items?.map((item, index) => (
+                          <motion.tr
+                            key={index}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.1 * index }}
+                            className="hover:bg-gray-50 transition-colors"
+                          >
                             <td className="px-6 py-4 whitespace-nowrap">
                               <div className="flex items-center">
                                 <div className="ml-4">
                                   <div className="text-sm font-medium text-gray-900">{item.product_name}</div>
                                   <div className="text-sm text-gray-500">
-                                    {item.size && <span>Size: {item.size} </span>}
-                                    {item.color && <span>Color: {item.color}</span>}
+                                    {item.size && <span className="inline-block bg-gray-100 rounded-full px-2 py-1 text-xs mr-2">Size: {item.size}</span>}
+                                    {item.color && <span className="inline-block bg-gray-100 rounded-full px-2 py-1 text-xs">Color: {item.color}</span>}
                                   </div>
                                 </div>
                               </div>
@@ -1655,23 +1719,31 @@ const AdminDashboard = () => {
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                               {item.quantity}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                               ${formatPrice(item.price * item.quantity)}
                             </td>
-                          </tr>
+                          </motion.tr>
                         ))}
                       </tbody>
                     </table>
                   </div>
-                </div>
+                </motion.div>
 
-                {/* Order Summary */}
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-3">Order Summary</h3>
-                  <div className="space-y-2">
+                {/* Order Summary - Card with accent border */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="border-l-4 border-indigo-500 bg-white rounded-lg shadow-sm p-5"
+                >
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                    <FiDollarSign className="mr-2 text-indigo-500" />
+                    Order Summary
+                  </h3>
+                  <div className="space-y-3">
                     <div className="flex justify-between">
                       <span className="text-gray-600">Subtotal</span>
-                      <span className="font-medium">${formatPrice(selectedOrderDetails.total_price)}</span>
+                      <span className="font-medium">${formatPrice(selectedOrderDetails?.total_price)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Shipping</span>
@@ -1681,75 +1753,77 @@ const AdminDashboard = () => {
                       <span className="text-gray-600">Tax</span>
                       <span className="font-medium">$0.00</span>
                     </div>
-                    <div className="flex justify-between pt-2 border-t border-gray-200">
+                    <div className="flex justify-between pt-3 border-t border-gray-200">
                       <span className="text-lg font-bold">Total</span>
-                      <span className="text-lg font-bold">${formatPrice(selectedOrderDetails.total_price)}</span>
+                      <span className="text-lg font-bold text-indigo-600">${formatPrice(selectedOrderDetails?.total_price)}</span>
                     </div>
                   </div>
-                </div>
+                </motion.div>
 
-                {/* Order Status */}
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-800 mb-1">Order Status</h3>
-                    <div className="flex items-center gap-2">
-                      <span className={`px-3 py-1 rounded-full text-sm font-medium
-                  ${selectedOrderDetails.status === 'completed' ? 'bg-green-100 text-green-800' : ''}
-                  ${selectedOrderDetails.status === 'shipped' ? 'bg-blue-100 text-blue-800' : ''}
-                  ${selectedOrderDetails.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : ''}
-                  ${selectedOrderDetails.status === 'cancelled' ? 'bg-red-100 text-red-800' : ''}`}>
-                        {selectedOrderDetails.status}
-                      </span>
-                      {selectedOrderDetails.payment && (
+                {/* Status and Actions - Sticky footer-like section */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4 }}
+                  className="sticky bottom-0 bg-white border-t border-gray-200 -mx-6 px-6 py-4"
+                >
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div className="flex items-center gap-3">
+                      <div>
+                        <p className="text-sm text-gray-500 mb-1">Order Status</p>
                         <span className={`px-3 py-1 rounded-full text-sm font-medium
-                    ${selectedOrderDetails.payment.payment_status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
-                          {selectedOrderDetails.payment.payment_method}
+                    ${selectedOrderDetails?.status === 'completed' ? 'bg-green-100 text-green-800' : ''}
+                    ${selectedOrderDetails?.status === 'shipped' ? 'bg-blue-100 text-blue-800' : ''}
+                    ${selectedOrderDetails?.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : ''}
+                    ${selectedOrderDetails?.status === 'cancelled' ? 'bg-red-100 text-red-800' : ''}`}>
+                          {selectedOrderDetails?.status}
                         </span>
+                      </div>
+                      {selectedOrderDetails?.payment && (
+                        <div>
+                          <p className="text-sm text-gray-500 mb-1">Payment</p>
+                          <span className={`px-3 py-1 rounded-full text-sm font-medium
+                      ${selectedOrderDetails?.payment.payment_status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                            {selectedOrderDetails?.payment.payment_method}
+                          </span>
+                        </div>
                       )}
                     </div>
-                  </div>
 
-                  <div className="flex gap-2 w-full sm:w-auto">
-                    <select
-                      className="w-full sm:w-auto px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                      value={selectedOrderDetails.status}
-                      onChange={(e) => {
-                        updateOrderStatus(selectedOrderDetails.id, e.target.value);
-                        setSelectedOrderDetails({
-                          ...selectedOrderDetails,
-                          status: e.target.value
-                        });
-                      }}
-                    >
-                      <option value="pending">Pending</option>
-                      <option value="shipped">Shipped</option>
-                      <option value="completed">Completed</option>
-                      <option value="cancelled">Cancelled</option>
-                    </select>
-                    <button
-                      onClick={() => {
-                        setViewOrderModal(false);
-                        viewOrderInvoice(selectedOrderDetails);
-                      }}
-                      className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    >
-                      <FiPrinter />
-                    </button>
+                    <div className="flex gap-3 w-full sm:w-auto">
+                      <select
+                        className="w-full sm:w-auto px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                        value={selectedOrderDetails?.status}
+                        onChange={(e) => {
+                          updateOrderStatus(selectedOrderDetails?.id, e.target.value);
+                          setSelectedOrderDetails({
+                            ...selectedOrderDetails,
+                            status: e.target.value
+                          });
+                        }}
+                      >
+                        <option value="pending">Pending</option>
+                        <option value="shipped">Shipped</option>
+                        <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
+                      </select>
+                      <button
+                        onClick={() => {
+                          setViewOrderModal(false);
+                          viewOrderInvoice(selectedOrderDetails);
+                        }}
+                        className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors"
+                      >
+                        <FiPrinter size={16} />
+                        <span className="hidden sm:inline">Print</span>
+                      </button>
+                    </div>
                   </div>
-                </div>
+                </motion.div>
               </div>
-
-              <div className="bg-gray-50 px-6 py-4 flex justify-end">
-                <button
-                  onClick={() => setViewOrderModal(false)}
-                  className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
+            </motion.div>
           </div>
-        </div>
+        </AnimatePresence>
       )}
       {showInvoice && selectedOrder && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
