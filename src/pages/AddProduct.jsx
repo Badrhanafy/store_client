@@ -3,6 +3,8 @@ import axios from 'axios';
 import { FiUpload, FiPlus, FiX, FiDollarSign, FiHash, FiType } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 import {useTranslation} from "react-i18next"
+import { useEffect } from 'react';
+axios.defaults.withCredentials = true;
 // Consistent with your store's font classes
 const fontClasses = {
   heading: "font-['Playfair_Display'] font-bold",
@@ -28,7 +30,16 @@ export default function AddProduct() {
   const [success, setSuccess] = useState(false);
   const [newColor, setNewColor] = useState('');
   const [newSize, setNewSize] = useState('');
-
+ useEffect(() => {
+    const getCsrfToken = async () => {
+      try {
+        await axios.get('http://localhost:8000/sanctum/csrf-cookie');
+      } catch (error) {
+        console.error('Error fetching CSRF token:', error);
+      }
+    };
+    getCsrfToken();
+  }, []);
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -79,13 +90,13 @@ export default function AddProduct() {
     });
   };
 
- const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
   e.preventDefault();
   setIsSubmitting(true);
 
   const formDataToSend = new FormData();
   
-  // Append all fields except arrays
+  // Append all simple fields
   formDataToSend.append('title', formData.title);
   formDataToSend.append('description', formData.description);
   formDataToSend.append('price', formData.price);
@@ -93,14 +104,9 @@ export default function AddProduct() {
   formDataToSend.append('category', formData.category);
   formDataToSend.append('image', formData.image);
 
-  // Append each color and size individually
-  formData.colors.forEach(color => {
-    formDataToSend.append('colors[]', color);
-  });
-
-  formData.sizes.forEach(size => {
-    formDataToSend.append('sizes[]', size);
-  });
+  // Convert arrays to JSON strings before appending
+  formDataToSend.append('sizes', JSON.stringify(formData.sizes));
+  formDataToSend.append('colors', JSON.stringify(formData.colors));
 
   try {
     const res = await axios.post('http://localhost:8000/api/products', formDataToSend, {
@@ -108,7 +114,9 @@ export default function AddProduct() {
         'Content-Type': 'multipart/form-data',
         'Accept': 'application/json',
       },
+      withCredentials: true,
     });
+    
     console.log('Product added:', res.data);
     setSuccess(true);
     
@@ -124,13 +132,11 @@ export default function AddProduct() {
       sizes: []
     });
     setPreviewImage(null);
-    setNewColor('');
-    setNewSize('');
     
     setTimeout(() => setSuccess(false), 3000);
   } catch (err) {
     console.error('Error:', err.response?.data || err.message);
-    alert('Error adding product! Please check the console for details.');
+    alert(`Error adding product: ${err.response?.data?.message || err.message}`);
   } finally {
     setIsSubmitting(false);
   }
