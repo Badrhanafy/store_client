@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { 
-  FiShoppingCart, FiUsers, FiDollarSign, FiPrinter, FiPieChart, 
-  FiSettings, FiLogOut, FiMenu, FiX, FiSearch, FiEdit, FiTrash2, 
-  FiPlus, FiImage, FiChevronDown, FiChevronUp, FiUpload, FiHash, 
-  FiType, FiPlusCircle 
+import {
+  FiShoppingCart, FiUsers, FiDollarSign, FiPrinter, FiPieChart,
+  FiSettings, FiLogOut, FiMenu, FiX, FiSearch, FiEdit, FiTrash2,
+  FiPlus, FiImage, FiChevronDown, FiChevronUp, FiUpload, FiHash,
+  FiType, FiPlusCircle
 } from 'react-icons/fi';
 import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
@@ -41,6 +41,8 @@ const AdminDashboard = () => {
   const [imageUploading, setImageUploading] = useState(false);
   const [showAddProduct, setShowAddProduct] = useState(false);
 
+  const [viewOrderModal, setViewOrderModal] = useState(false);
+  const [selectedOrderDetails, setSelectedOrderDetails] = useState(null);
   // Product form state
   const [formData, setFormData] = useState({
     title: '',
@@ -69,7 +71,20 @@ const AdminDashboard = () => {
     i18n.changeLanguage(lng);
     document.dir = lng === 'ar' ? 'rtl' : 'ltr';
   };
+  const viewOrderDetails = async (order) => {
+    try {
+      // If you need to fetch more detailed information about the order
+      // const response = await axios.get(`${API_URL}/orders/${order.id}`);
+      // setSelectedOrderDetails(response.data);
 
+      // Or use the existing order data if it's sufficient
+      setSelectedOrderDetails(order);
+      setViewOrderModal(true);
+    } catch (error) {
+      console.error('Error fetching order details:', error);
+      toast.error('Failed to load order details');
+    }
+  };
   // Get CSRF token
   useEffect(() => {
     const getCsrfToken = async () => {
@@ -404,7 +419,7 @@ const AdminDashboard = () => {
     setIsSubmitting(true);
 
     const formDataToSend = new FormData();
-    
+
     // Append all fields
     formDataToSend.append('title', formData.title);
     formDataToSend.append('description', formData.description);
@@ -425,11 +440,11 @@ const AdminDashboard = () => {
         },
         withCredentials: true,
       });
-      
+
       console.log('Product added:', res.data);
       setSuccess(true);
       fetchProducts(); // Refresh products list
-      
+
       // Reset form
       setFormData({
         title: '',
@@ -442,7 +457,7 @@ const AdminDashboard = () => {
         sizes: []
       });
       setPreviewImage(null);
-      
+
       setTimeout(() => setSuccess(false), 3000);
       setShowAddProduct(false); // Close the add product form
     } catch (err) {
@@ -491,7 +506,7 @@ const AdminDashboard = () => {
           },
         }}
       />
-      
+
       {/* Mobile sidebar backdrop */}
       {mobileSidebarOpen && (
         <div
@@ -896,10 +911,7 @@ const AdminDashboard = () => {
                               <div className="flex flex-col sm:flex-row sm:space-x-2 space-y-1 sm:space-y-0">
                                 <button
                                   className="text-indigo-600 hover:text-indigo-900"
-                                  onClick={() => {
-                                    // Implement order details view or edit modal
-                                    console.log('View order:', order);
-                                  }}
+                                  onClick={() => viewOrderDetails(order)}
                                 >
                                   <FiEdit size={16} />
                                 </button>
@@ -1040,7 +1052,7 @@ const AdminDashboard = () => {
 
               {/* Add Product Form */}
               {showAddProduct && (
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 20 }}
@@ -1048,7 +1060,7 @@ const AdminDashboard = () => {
                 >
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-xl font-semibold">Add New Product</h3>
-                    <button 
+                    <button
                       onClick={() => setShowAddProduct(false)}
                       className="text-gray-500 hover:text-gray-700"
                     >
@@ -1057,7 +1069,7 @@ const AdminDashboard = () => {
                   </div>
 
                   {success && (
-                    <motion.div 
+                    <motion.div
                       initial={{ opacity: 0, y: -20 }}
                       animate={{ opacity: 1, y: 0 }}
                       className="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4 rounded"
@@ -1195,14 +1207,14 @@ const AdminDashboard = () => {
                                   <p className="text-xs text-gray-500">PNG, JPG, JPEG (Max. 5MB)</p>
                                 </div>
                               )}
-                              <input 
-                                id="image" 
-                                name="image" 
-                                type="file" 
-                                className="hidden" 
-                                onChange={handleImageChange} 
-                                accept="image/*" 
-                                required 
+                              <input
+                                id="image"
+                                name="image"
+                                type="file"
+                                className="hidden"
+                                onChange={handleImageChange}
+                                accept="image/*"
+                                required
                               />
                             </label>
                           </div>
@@ -1217,17 +1229,17 @@ const AdminDashboard = () => {
                       </label>
                       <div className="flex flex-wrap items-center gap-2 mb-2">
                         {formData.colors.map((color, index) => (
-                          <motion.div 
+                          <motion.div
                             key={index}
                             whileHover={{ scale: 1.05 }}
                             className="flex items-center px-3 py-1 rounded-full bg-gray-100 text-sm"
                           >
-                            <div 
+                            <div
                               className="w-4 h-4 rounded-full mr-2 border border-gray-300"
                               style={{ backgroundColor: color }}
                             />
                             {color}
-                            <button 
+                            <button
                               type="button"
                               onClick={() => removeColor(color)}
                               className="ml-2 text-gray-500 hover:text-red-500"
@@ -1264,13 +1276,13 @@ const AdminDashboard = () => {
                       </label>
                       <div className="flex flex-wrap items-center gap-2 mb-2">
                         {formData.sizes.map((size, index) => (
-                          <motion.div 
+                          <motion.div
                             key={index}
                             whileHover={{ scale: 1.05 }}
                             className="flex items-center px-3 py-1 rounded-full bg-gray-100 text-sm"
                           >
                             {size}
-                            <button 
+                            <button
                               type="button"
                               onClick={() => removeSize(size)}
                               className="ml-2 text-gray-500 hover:text-red-500"
@@ -1560,6 +1572,185 @@ const AdminDashboard = () => {
       </div>
 
       {/* Invoice Modal */}
+
+      {viewOrderModal && selectedOrderDetails && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            {/* Background overlay */}
+            <div className="fixed inset-0 transition-opacity" aria-hidden="true">
+              <div className="absolute inset-0 bg-gray-900 bg-opacity-75" onClick={() => setViewOrderModal(false)}></div>
+            </div>
+
+            {/* Modal content */}
+            <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
+              <div className="bg-white px-6 py-4">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-800">Order Details</h2>
+                    <p className="text-gray-600">Order #{selectedOrderDetails.id}</p>
+                  </div>
+                  <button
+                    onClick={() => setViewOrderModal(false)}
+                    className="text-gray-400 hover:text-gray-500"
+                  >
+                    <FiX size={24} />
+                  </button>
+                </div>
+              </div>
+
+              <div className="px-6 py-4 space-y-6">
+                {/* Customer Information */}
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-3">Customer Information</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm text-gray-500">Name</p>
+                      <p className="font-medium">{selectedOrderDetails.customer_name || 'Guest'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Email</p>
+                      <p className="font-medium">{selectedOrderDetails.email || 'N/A'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Phone</p>
+                      <p className="font-medium">{selectedOrderDetails.phone || 'N/A'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Address</p>
+                      <p className="font-medium">{selectedOrderDetails.address || 'N/A'}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Order Items */}
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-800 mb-3">Order Items</h3>
+                  <div className="overflow-hidden border border-gray-200 rounded-lg">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-100">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Qty</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {selectedOrderDetails.order_items?.map((item, index) => (
+                          <tr key={index} className="hover:bg-gray-50">
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="flex items-center">
+                                <div className="ml-4">
+                                  <div className="text-sm font-medium text-gray-900">{item.product_name}</div>
+                                  <div className="text-sm text-gray-500">
+                                    {item.size && <span>Size: {item.size} </span>}
+                                    {item.color && <span>Color: {item.color}</span>}
+                                  </div>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                              ${formatPrice(item.price)}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                              {item.quantity}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                              ${formatPrice(item.price * item.quantity)}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Order Summary */}
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-3">Order Summary</h3>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Subtotal</span>
+                      <span className="font-medium">${formatPrice(selectedOrderDetails.total_price)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Shipping</span>
+                      <span className="font-medium">$0.00</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Tax</span>
+                      <span className="font-medium">$0.00</span>
+                    </div>
+                    <div className="flex justify-between pt-2 border-t border-gray-200">
+                      <span className="text-lg font-bold">Total</span>
+                      <span className="text-lg font-bold">${formatPrice(selectedOrderDetails.total_price)}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Order Status */}
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-800 mb-1">Order Status</h3>
+                    <div className="flex items-center gap-2">
+                      <span className={`px-3 py-1 rounded-full text-sm font-medium
+                  ${selectedOrderDetails.status === 'completed' ? 'bg-green-100 text-green-800' : ''}
+                  ${selectedOrderDetails.status === 'shipped' ? 'bg-blue-100 text-blue-800' : ''}
+                  ${selectedOrderDetails.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : ''}
+                  ${selectedOrderDetails.status === 'cancelled' ? 'bg-red-100 text-red-800' : ''}`}>
+                        {selectedOrderDetails.status}
+                      </span>
+                      {selectedOrderDetails.payment && (
+                        <span className={`px-3 py-1 rounded-full text-sm font-medium
+                    ${selectedOrderDetails.payment.payment_status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                          {selectedOrderDetails.payment.payment_method}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2 w-full sm:w-auto">
+                    <select
+                      className="w-full sm:w-auto px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      value={selectedOrderDetails.status}
+                      onChange={(e) => {
+                        updateOrderStatus(selectedOrderDetails.id, e.target.value);
+                        setSelectedOrderDetails({
+                          ...selectedOrderDetails,
+                          status: e.target.value
+                        });
+                      }}
+                    >
+                      <option value="pending">Pending</option>
+                      <option value="shipped">Shipped</option>
+                      <option value="completed">Completed</option>
+                      <option value="cancelled">Cancelled</option>
+                    </select>
+                    <button
+                      onClick={() => {
+                        setViewOrderModal(false);
+                        viewOrderInvoice(selectedOrderDetails);
+                      }}
+                      className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    >
+                      <FiPrinter />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gray-50 px-6 py-4 flex justify-end">
+                <button
+                  onClick={() => setViewOrderModal(false)}
+                  className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       {showInvoice && selectedOrder && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
