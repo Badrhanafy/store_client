@@ -4,7 +4,7 @@ import {
   FiShoppingCart, FiUsers, FiDollarSign, FiPrinter, FiPieChart,
   FiSettings, FiLogOut, FiMenu, FiX, FiSearch, FiEdit, FiTrash2,
   FiPlus, FiImage, FiChevronDown, FiChevronUp, FiUpload, FiHash,
-  FiType, FiPlusCircle
+  FiType, FiPlusCircle, FiMoreHorizontal
 } from 'react-icons/fi';
 import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
@@ -197,7 +197,34 @@ const AdminDashboard = () => {
       e.target.value = ''; // Reset file input
     }
   };
-
+  const Tooltip = ({ children, text }) => {
+    return (
+      <motion.div
+        className="relative inline-block"
+        initial="hidden"
+        whileHover="visible"
+      >
+        {children}
+        <motion.div
+          className="absolute z-50 w-max px-2 py-1 text-xs bg-gray-800 text-white rounded shadow-lg"
+          variants={{
+            hidden: { opacity: 0, y: 5 },
+            visible: { opacity: 1, y: 0 }
+          }}
+          transition={{ duration: 0.2 }}
+          style={{
+            left: '50%',
+            transform: 'translateX(-50%)',
+            bottom: '100%',
+            marginBottom: '5px'
+          }}
+        >
+          {text}
+          <div className="absolute left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-b-0 border-t-4 border-solid border-gray-800 border-l-transparent border-r-transparent" />
+        </motion.div>
+      </motion.div>
+    );
+  };
   // Fetch orders from Laravel backend
   const fetchOrders = async () => {
     setLoading(true);
@@ -293,7 +320,7 @@ const AdminDashboard = () => {
 
   // Delete order
   const deleteOrder = async (orderId) => {
-    toast((t) => (
+    toast(() => (
       <div className="flex flex-col space-y-2">
         <p>{t('confirmDeleteOrder')}</p>
         <div className="flex justify-end space-x-2">
@@ -413,37 +440,37 @@ const AdminDashboard = () => {
       sizes: formData.sizes.filter(size => size !== sizeToRemove)
     });
   };
-const modalVariants = {
-  hidden: {
-    opacity: 0,
-    y: -20,
-    transition: {
-      duration: 0.3,
-      ease: "easeInOut"
+  const modalVariants = {
+    hidden: {
+      opacity: 0,
+      y: -20,
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut"
+      }
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut"
+      }
+    },
+    exit: {
+      opacity: 0,
+      y: 20,
+      transition: {
+        duration: 0.2,
+        ease: "easeInOut"
+      }
     }
-  },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.3,
-      ease: "easeInOut"
-    }
-  },
-  exit: {
-    opacity: 0,
-    y: 20,
-    transition: {
-      duration: 0.2,
-      ease: "easeInOut"
-    }
-  }
-};
+  };
 
-const backdropVariants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 0.75 }
-};
+  const backdropVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 0.75 }
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -548,9 +575,11 @@ const backdropVariants = {
       {/* Sidebar */}
       <div
         className={`sidebar-container fixed lg:static z-30 w-64 bg-black text-white transition-all duration-300 ease-in-out 
-        ${sidebarOpen ? 'translate-x-0' : '-translate-x-64'} 
-        ${mobileSidebarOpen ? 'translate-x-0' : '-translate-x-64'} lg:translate-x-0`}
+             ${sidebarOpen ? 'translate-x-0' : '-translate-x-64'} 
+             ${mobileSidebarOpen ? 'translate-x-0' : '-translate-x-64'} lg:translate-x-0
+            h-screen lg:h-auto lg:min-h-screen flex flex-col`}
       >
+
         <div className="p-4 flex items-center justify-between border-b border-indigo-700">
           <h1 className="text-xl font-bold">FORTIS SPACE</h1>
           <button
@@ -874,7 +903,7 @@ const backdropVariants = {
                           <th className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('order')}</th>
                           <th className="hidden sm:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('customer')}</th>
                           <th className="hidden md:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('phone')}</th>
-                          <th className="hidden sm:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('date')}</th>
+
                           <th className="hidden md:table-cell px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('items')}</th>
                           <th className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('amount')}</th>
                           <th className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('status')}</th>
@@ -903,9 +932,7 @@ const backdropVariants = {
                             <td className="hidden md:table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                               {order.phone || 'N/A'}
                             </td>
-                            <td className="hidden sm:table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              {formatDate(order.created_at)}
-                            </td>
+
                             <td className="hidden md:table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                               <div className="flex flex-col">
                                 <span>{order.order_items?.length || 0}</span>
@@ -939,21 +966,36 @@ const backdropVariants = {
                             </td>
                             <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap text-sm font-medium">
                               <div className="flex flex-col sm:flex-row sm:space-x-2 space-y-1 sm:space-y-0">
-                                <button
-                                  className="text-indigo-600 hover:text-indigo-900"
-                                  onClick={() => viewOrderDetails(order)}
-                                >
-                                  <FiEdit size={16} />
-                                </button>
-                                {order.status === 'shipped' && (
+                                {/* Details Button */}
+                                <Tooltip text={t('viewDetails')}>
                                   <button
                                     className="text-indigo-600 hover:text-indigo-900"
-                                    onClick={() => viewOrderInvoice(order)}
-                                    title={t('viewInvoice')}
+                                    onClick={() => viewOrderDetails(order)}
                                   >
-                                    <FiPrinter size={16} />
+                                    <FiEdit size={16} />
                                   </button>
+                                </Tooltip>
+
+                                {/* Print Button (if applicable) */}
+                                {order.status === 'shipped' && (
+                                  <Tooltip text={t('viewInvoice')}>
+                                    <button
+                                      className="text-indigo-600 hover:text-indigo-900"
+                                      onClick={() => viewOrderInvoice(order)}
+                                    >
+                                      <FiPrinter size={16} />
+                                    </button>
+                                  </Tooltip>
                                 )}
+                                <Tooltip text={t('deleteOrder')}>
+                                  <button
+                                    className="text-red-600 hover:text-red-900"
+                                    onClick={() => deleteOrder(order.id)}
+                                  >
+                                    <FiTrash2 size={16} />
+                                  </button>
+                                </Tooltip>
+                                {/* Status Dropdown */}
                                 <select
                                   className="text-xs sm:text-sm border rounded p-1 focus:outline-none focus:ring-1 focus:ring-indigo-500"
                                   value={order.status}
@@ -964,12 +1006,9 @@ const backdropVariants = {
                                   <option value="completed">{t('completed')}</option>
                                   <option value="cancelled">{t('cancelled')}</option>
                                 </select>
-                                <button
-                                  className="text-red-600 hover:text-red-900"
-                                  onClick={() => deleteOrder(order.id)}
-                                >
-                                  <FiTrash2 size={16} />
-                                </button>
+
+                                {/* Delete Button */}
+
                               </div>
                             </td>
                           </tr>
@@ -1630,6 +1669,7 @@ const backdropVariants = {
                   <div>
                     <h2 className="text-2xl font-bold text-white">Order Details</h2>
                     <p className="text-indigo-100">Order #{selectedOrderDetails?.id}</p>
+
                   </div>
                   <button
                     onClick={() => setViewOrderModal(false)}
@@ -1841,6 +1881,12 @@ const backdropVariants = {
                   <div>
                     <h2 className="text-2xl font-bold text-gray-800">{t('invoice')}</h2>
                     <p className="text-gray-600">{t('order')} # {selectedOrder.id}</p>
+                    <img
+                      src="FORTIS-01.png"
+                      alt="Fortis Logo"
+                      style={{ border: "4px solid" }}
+                      className="h-26 md:h-22 w-auto max-w-[220px] md:max-w-[280px] object-contain transform hover:scale-105 transition-transform duration-200"
+                    />
                   </div>
                   <div className="text-right">
                     <p className="text-gray-600">{t('date')}: {formatDate(selectedOrder.created_at)}</p>
