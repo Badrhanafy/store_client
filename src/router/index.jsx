@@ -20,6 +20,7 @@ import ProductList from "../pages/products"
 import Products from "../pages/admin/Products"
 import OrdersComponent from "../pages/admin/Orders"
 import SettingsComponent from "../pages/admin/Settings"
+import ForgotResetPassword from "../pages/PwdReset"
 export const router = createBrowserRouter([
   {
     element : <Layout/>,
@@ -36,10 +37,10 @@ export const router = createBrowserRouter([
         path : '/',
         element : <HomePage/>
       },
-    /*   {
+      {
         path : '/login',
         element : <Login/>
-      }, */
+      },
       {
         path : '/signup',
         element : <Signup/>
@@ -73,9 +74,10 @@ export const router = createBrowserRouter([
         element: <Casketat/>
       },
        {
-        path : '/Login',
-        element: <AdminLogin/>
+        path : '/PasswoRdreset',
+        element: <ForgotResetPassword/>
       },
+      
      
     ]
   }

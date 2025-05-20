@@ -34,6 +34,8 @@ const AdminDashboard = () => {
     completedOrders: 0,
     averageOrderValue: 0
   });
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [sortOrder, setSortOrder] = useState('newest');
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showInvoice, setShowInvoice] = useState(false);
   const [expandedProductId, setExpandedProductId] = useState(null);
@@ -364,11 +366,26 @@ const AdminDashboard = () => {
   }, [activeTab]);
 
   // Filter orders based on search query
-  const filteredOrders = orders.filter(order =>
-    (order.customer_name && order.customer_name.toLowerCase().includes(searchQuery.toLowerCase())) ||
-    order.id.toString().includes(searchQuery) ||
-    (order.phone && order.phone.includes(searchQuery))
-  );
+ const filteredOrders = orders
+  .filter(order => {
+    // Search filter
+    const matchesSearch = 
+      (order.customer_name && order.customer_name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      order.id.toString().includes(searchQuery) ||
+      (order.phone && order.phone.includes(searchQuery));
+    
+    // Status filter
+    const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
+    
+    return matchesSearch && matchesStatus;
+  })
+  .sort((a, b) => {
+    // Sort by date
+    const dateA = new Date(a.created_at);
+    const dateB = new Date(b.created_at);
+    
+    return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
+  });
 
   // Format date for display
   const formatDate = (dateString) => {
@@ -877,19 +894,46 @@ const AdminDashboard = () => {
 
           {activeTab === 'orders' && (
             <div>
+              
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-2">
-                <h2 className="text-xl sm:text-2xl font-semibold">{t('orderManagement')}</h2>
-                <div className="relative w-full sm:w-64">
-                  <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder={t('searchOrders')}
-                    className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
-                </div>
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-2">
+  <h2 className="text-xl sm:text-2xl font-semibold">{t('orderManagement')}</h2>
+  <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+    <div className="relative w-full sm:w-64">
+      <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+      <input
+        type="text"
+        placeholder={t('searchOrders')}
+        className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+      />
+    </div>
+    <div className="flex gap-2">
+      <select
+        className="w-full sm:w-auto px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        value={statusFilter}
+        onChange={(e) => setStatusFilter(e.target.value)}
+      >
+        <option value="all">All Statuses</option>
+        <option value="pending">Pending</option>
+        <option value="shipped">Shipped</option>
+        <option value="completed">Completed</option>
+        <option value="cancelled">Cancelled</option>
+      </select>
+      <select
+        className="w-full sm:w-auto px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        value={sortOrder}
+        onChange={(e) => setSortOrder(e.target.value)}
+      >
+        <option value="newest">Newest First</option>
+        <option value="oldest">Oldest First</option>
+      </select>
+    </div>
+  </div>
+</div>                 
               </div>
+              
 
               {loading ? (
                 <div className="flex justify-center py-8">
@@ -1445,8 +1489,15 @@ const AdminDashboard = () => {
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                   ${formatPrice(product.price)}
                                 </td>
+                                {/* In the products table row, modify the stock cell to show an out of stock indicator */}
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                  {product.qte || 0}
+                                  {product.qte <= 0 ? (
+                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                      Out of Stock
+                                    </span>
+                                  ) : (
+                                    product.qte
+                                  )}
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                   <div className="flex space-x-2">
@@ -1943,7 +1994,7 @@ const AdminDashboard = () => {
                             <td className="px-6 py-4 whitespace-nowrap">
                               <div className="flex items-center">
                                 <div className="ml-4">
-                                  <div className="text-sm font-medium text-gray-900">{item.product.title||selectedOrder.order_items[0].product.title}</div>
+                                  <div className="text-sm font-medium text-gray-900">{item.product.title || selectedOrder.order_items[0].product.title}</div>
                                   {item.size && (
                                     <div className="text-sm text-gray-500">{t('size')}: {item.size}</div>
                                   )}
