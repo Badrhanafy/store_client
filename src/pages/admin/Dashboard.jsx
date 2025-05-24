@@ -9,7 +9,8 @@ import {
 import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
-
+import ProductEditForm from './ProductEdit';
+import OutOfStockProducts from './OutofStock';
 // Font classes consistent with your store
 const fontClasses = {
   heading: "font-['Playfair_Display'] font-bold",
@@ -34,6 +35,31 @@ const AdminDashboard = () => {
     completedOrders: 0,
     averageOrderValue: 0
   });
+  //edit product form 
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+
+  const handleSaveProduct = async (updatedData) => {
+    try {
+      // Call your API to update the product
+      const response = await axios.put(`${API_URL}/products/${editingProduct.id}`, updatedData);
+
+      // Update local state or refetch products
+      fetchProducts();
+
+      // Close the edit form
+      setIsEditing(false);
+      setEditingProduct(null);
+
+      // Show success message
+      toast.success('Product updated successfully!');
+    } catch (error) {
+      toast.error('Failed to update product');
+      console.error('Error updating product:', error);
+    }
+  };
+
+  //
   const [statusFilter, setStatusFilter] = useState('all');
   const [sortOrder, setSortOrder] = useState('newest');
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -366,26 +392,26 @@ const AdminDashboard = () => {
   }, [activeTab]);
 
   // Filter orders based on search query
- const filteredOrders = orders
-  .filter(order => {
-    // Search filter
-    const matchesSearch = 
-      (order.customer_name && order.customer_name.toLowerCase().includes(searchQuery.toLowerCase())) ||
-      order.id.toString().includes(searchQuery) ||
-      (order.phone && order.phone.includes(searchQuery));
-    
-    // Status filter
-    const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
-    
-    return matchesSearch && matchesStatus;
-  })
-  .sort((a, b) => {
-    // Sort by date
-    const dateA = new Date(a.created_at);
-    const dateB = new Date(b.created_at);
-    
-    return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
-  });
+  const filteredOrders = orders
+    .filter(order => {
+      // Search filter
+      const matchesSearch =
+        (order.customer_name && order.customer_name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        order.id.toString().includes(searchQuery) ||
+        (order.phone && order.phone.includes(searchQuery));
+
+      // Status filter
+      const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
+
+      return matchesSearch && matchesStatus;
+    })
+    .sort((a, b) => {
+      // Sort by date
+      const dateA = new Date(a.created_at);
+      const dateB = new Date(b.created_at);
+
+      return sortOrder === 'newest' ? dateB - dateA : dateA - dateB;
+    });
 
   // Format date for display
   const formatDate = (dateString) => {
@@ -804,19 +830,9 @@ const AdminDashboard = () => {
                   </div>
                 </div>
 
-                {/* Average Order Value Card */}
-                <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm">
-                  <div className="flex items-center">
-                    <div className="p-2 sm:p-3 rounded-lg bg-purple-100 text-purple-600 mr-3 sm:mr-4">
-                      <FiShoppingCart size={20} className="sm:w-6 sm:h-6" />
-                    </div>
-                    <div>
-                      <p className="text-xs sm:text-sm text-gray-500">{t('averageOrderValue')}</p>
-                      <p className="text-lg sm:text-2xl font-bold">${stats.averageOrderValue.toLocaleString(i18n.language)}</p>
-                    </div>
-                  </div>
-                </div>
+           
               </div>
+              
 
               {/* Recent orders preview */}
               <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm">
@@ -889,51 +905,65 @@ const AdminDashboard = () => {
                   </div>
                 )}
               </div>
+                  <div className="mt-8">
+      <OutOfStockProducts 
+        products={products}
+        onEditProduct={(product) => {
+          setEditingProduct(product);
+          setIsEditing(true);
+        }}
+        onRestock={(product) => {
+          // Implement your restock logic here
+          // Could open a restock modal or directly update inventory
+          console.log("Restock product:", product);
+        }}
+      />
+    </div>
             </div>
           )}
 
           {activeTab === 'orders' && (
             <div>
-              
+
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-2">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-2">
-  <h2 className="text-xl sm:text-2xl font-semibold">{t('orderManagement')}</h2>
-  <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-    <div className="relative w-full sm:w-64">
-      <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-      <input
-        type="text"
-        placeholder={t('searchOrders')}
-        className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-      />
-    </div>
-    <div className="flex gap-2">
-      <select
-        className="w-full sm:w-auto px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        value={statusFilter}
-        onChange={(e) => setStatusFilter(e.target.value)}
-      >
-        <option value="all">All Statuses</option>
-        <option value="pending">Pending</option>
-        <option value="shipped">Shipped</option>
-        <option value="completed">Completed</option>
-        <option value="cancelled">Cancelled</option>
-      </select>
-      <select
-        className="w-full sm:w-auto px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-        value={sortOrder}
-        onChange={(e) => setSortOrder(e.target.value)}
-      >
-        <option value="newest">Newest First</option>
-        <option value="oldest">Oldest First</option>
-      </select>
-    </div>
-  </div>
-</div>                 
+                  <h2 className="text-xl sm:text-2xl font-semibold">{t('orderManagement')}</h2>
+                  <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                    <div className="relative w-full sm:w-64">
+                      <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                      <input
+                        type="text"
+                        placeholder={t('searchOrders')}
+                        className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <select
+                        className="w-full sm:w-auto px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                      >
+                        <option value="all">All Statuses</option>
+                        <option value="pending">Pending</option>
+                        <option value="shipped">Shipped</option>
+                        <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
+                      </select>
+                      <select
+                        className="w-full sm:w-auto px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        value={sortOrder}
+                        onChange={(e) => setSortOrder(e.target.value)}
+                      >
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
               </div>
-              
+
 
               {loading ? (
                 <div className="flex justify-center py-8">
@@ -1507,9 +1537,16 @@ const AdminDashboard = () => {
                                     >
                                       {expandedProductId === product.id ? <FiChevronUp size={16} /> : <FiChevronDown size={16} />}
                                     </button>
-                                    <button className="text-indigo-600 hover:text-indigo-900">
+                                    <button
+                                      onClick={() => {
+                                        setEditingProduct(product);
+                                        setIsEditing(true);
+                                      }}
+                                      className="text-indigo-600 hover:text-indigo-900"
+                                    >
                                       <FiEdit size={16} />
                                     </button>
+
                                     <button className="text-red-600 hover:text-red-900">
                                       <FiTrash2 size={16} />
                                     </button>
@@ -2092,8 +2129,21 @@ const AdminDashboard = () => {
           </div>
         </div>
       )}
+      {isEditing && (
+        <div className="fixed inset-0  z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+          <ProductEditForm
+            product={editingProduct}
+            onSave={handleSaveProduct}
+            onCancel={() => {
+              setIsEditing(false);
+              setEditingProduct(null);
+            }}
+          />
+        </div>
+      )}
     </div>
   );
+
 };
 
 export default AdminDashboard;
