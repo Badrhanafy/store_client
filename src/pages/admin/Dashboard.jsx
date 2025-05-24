@@ -787,9 +787,26 @@ const AdminDashboard = () => {
           )}
 
           {activeTab === 'dashboard' && (
-            <div>
-              <h2 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6">{t('storeOverview')}</h2>
 
+            <div>
+              
+                {products.filter(product => product.qte <= 0).length > 0 && (
+                  <div className="mt-8">
+                    <OutOfStockProducts
+                      products={products}
+                      onEditProduct={(product) => {
+                        setEditingProduct(product);
+                        setIsEditing(true);
+                      }}
+                      onRestock={(product) => {
+                        console.log("Restock product:", product);
+                      }}
+                    />
+                  </div>
+                )}
+              
+              <h2 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6">{t('storeOverview')}</h2>
+             
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
                 {/* Total Sales Card */}
                 <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm">
@@ -905,20 +922,7 @@ const AdminDashboard = () => {
                   </div>
                 )}
               </div>
-                  <div className="mt-8">
-      <OutOfStockProducts 
-        products={products}
-        onEditProduct={(product) => {
-          setEditingProduct(product);
-          setIsEditing(true);
-        }}
-        onRestock={(product) => {
-          // Implement your restock logic here
-          // Could open a restock modal or directly update inventory
-          console.log("Restock product:", product);
-        }}
-      />
-    </div>
+              
             </div>
           )}
 

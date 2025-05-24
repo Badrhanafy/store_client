@@ -3,7 +3,6 @@ import { FiAlertTriangle, FiEdit, FiPlus, FiRefreshCw } from 'react-icons/fi';
 import { motion } from 'framer-motion';
 
 const OutOfStockProducts = ({ products, onEditProduct, onRestock }) => {
-  // Filter out-of-stock products
   const outOfStockProducts = products.filter(product => product.qte <= 0);
 
   // Animation variants
@@ -13,54 +12,92 @@ const OutOfStockProducts = ({ products, onEditProduct, onRestock }) => {
     hover: { scale: 1.02, boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)" }
   };
 
-  // Header animation variants
+  // Modern alert header animation
   const alertVariants = {
-    pulse: {
-      scale: [1, 1.05, 1],
+    initial: { 
+      backgroundColor: 'rgba(248, 113, 113, 1)', // red-400
+      scale: 1 
+    },
+    animate: { 
+      backgroundColor: ['rgba(248, 113, 113, 1)', 'rgba(248, 113, 113, 0.9)', 'rgba(248, 113, 113, 1)'],
+      scale: [1, 1.005, 1],
       transition: {
-        duration: 1.5,
+        duration: 2,
         repeat: Infinity,
         ease: "easeInOut"
       }
     }
   };
 
+  // Text fade animation
+  const textVariants = {
+    hidden: { opacity: 0 },
+    visible: { 
+      opacity: 1,
+      transition: {
+        duration: 0.8,
+        ease: "easeOut"
+      }
+    }
+  };
+
+  // Icon animation
+  const iconVariants = {
+    hidden: { rotate: 0 },
+    visible: {
+      rotate: [0, -5, 5, 0],
+      transition: {
+        duration: 1,
+        repeat: Infinity,
+        repeatDelay: 3
+      }
+    }
+  };
+
   return (
     <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-      {/* Header with alert animation */}
+      {/* Header with modern alert animation */}
       <motion.div 
         className="bg-red-400 px-6 py-4 flex items-center justify-between"
         variants={alertVariants}
-        animate={outOfStockProducts.length > 0 ? "pulse" : ""}
+        initial="initial"
+        animate={outOfStockProducts.length > 0 ? "animate" : "initial"}
       >
         <div className="flex items-center">
           <motion.div
-            animate={{
-              rotate: [0, -10, 10, 0],
-              transition: {
-                duration: 0.5,
-                repeat: outOfStockProducts.length > 0 ? Infinity : 0,
-                repeatDelay: 2
-              }
-            }}
+            variants={iconVariants}
+            animate={outOfStockProducts.length > 0 ? "visible" : "hidden"}
           >
             <FiAlertTriangle className="text-white mr-3" size={24} />
           </motion.div>
-          <h2 className="text-xl font-semibold text-white">Out of Stock Products</h2>
-          <span className="ml-3 bg-white text-red-400 px-2 py-1 rounded-full text-xs font-bold">
+          <motion.div
+            variants={textVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            <h2 className="text-xl font-semibold text-white">Out of Stock Products</h2>
+          </motion.div>
+          <motion.span 
+            className="ml-3 bg-white text-red-400 px-2 py-1 rounded-full text-xs font-bold"
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: 'spring', stiffness: 300 }}
+          >
             {outOfStockProducts.length}
-          </span>
+          </motion.span>
         </div>
-        <button 
+        <motion.button 
           onClick={() => onRestock()}
           className="flex items-center text-white hover:text-red-50 transition-colors"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
         >
           <FiRefreshCw className="mr-1" />
           Refresh
-        </button>
+        </motion.button>
       </motion.div>
 
-      {/* Content */}
+      {/* Content - rest remains the same */}
       <div className="p-4">
         {outOfStockProducts.length === 0 ? (
           <div className="text-center py-8">
