@@ -8,6 +8,7 @@ import {
 } from 'react-icons/fi';
 import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
+import NotificationCenter from './Notificationscenter';
 import { motion, AnimatePresence } from 'framer-motion';
 import ProductEditForm from './ProductEdit';
 import OutOfStockProducts from './OutofStock';
@@ -758,6 +759,9 @@ const AdminDashboard = () => {
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
+
+              <NotificationCenter API_URL={API_URL} />
+
               <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white font-semibold">
                 AD
               </div>
@@ -789,24 +793,24 @@ const AdminDashboard = () => {
           {activeTab === 'dashboard' && (
 
             <div>
-              
-                {products.filter(product => product.qte <= 0).length > 0 && (
-                  <div className="mt-8">
-                    <OutOfStockProducts
-                      products={products}
-                      onEditProduct={(product) => {
-                        setEditingProduct(product);
-                        setIsEditing(true);
-                      }}
-                      onRestock={(product) => {
-                        console.log("Restock product:", product);
-                      }}
-                    />
-                  </div>
-                )}
-              
+
+              {products.filter(product => product.qte <= 0).length > 0 && (
+                <div className="mt-8">
+                  <OutOfStockProducts
+                    products={products}
+                    onEditProduct={(product) => {
+                      setEditingProduct(product);
+                      setIsEditing(true);
+                    }}
+                    onRestock={(product) => {
+                      console.log("Restock product:", product);
+                    }}
+                  />
+                </div>
+              )}
+
               <h2 className="text-xl sm:text-2xl font-semibold mb-4 sm:mb-6">{t('storeOverview')}</h2>
-             
+
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
                 {/* Total Sales Card */}
                 <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm">
@@ -847,9 +851,9 @@ const AdminDashboard = () => {
                   </div>
                 </div>
 
-           
+
               </div>
-              
+
 
               {/* Recent orders preview */}
               <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm">
@@ -922,7 +926,7 @@ const AdminDashboard = () => {
                   </div>
                 )}
               </div>
-              
+
             </div>
           )}
 
