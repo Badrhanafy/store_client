@@ -21,10 +21,16 @@ import Products from "../pages/admin/Products"
 import OrdersComponent from "../pages/admin/Orders"
 import SettingsComponent from "../pages/admin/Settings"
 import ForgotResetPassword from "../pages/PwdReset"
+import AdminProtectedRoute from "../pages/admin/AdminProtectedroutes"
+import AdminProfile from "../pages/admin/Profile"
 export const router = createBrowserRouter([
   {
     element : <Layout/>,
     children:[
+      {
+          path:"/admin/profile",
+          element:<AdminProfile/>
+      },
       {
         path : 'AllProducts/product/:id',
         element : <ProductDetailsPage/>
@@ -83,18 +89,32 @@ export const router = createBrowserRouter([
     ]
   }
  ,
+     
+     
      {
-        path:"/admin/dashboard",
-        element: <AdminDashboard/>
-      },
-     {
-      path:"/admin/AllProductsFortest",
-      element:<Products/>
-     },
-      {
-      path:"/admin/Orders",
-      element:<OrdersComponent/>
-     },
+  path: "/admin/dashboard",
+  element: (
+    <AdminProtectedRoute>
+      <AdminDashboard />
+    </AdminProtectedRoute>
+  )
+},
+{
+  path: "/admin/AllProductsFortest",
+  element: (
+    <AdminProtectedRoute>
+      <Products />
+    </AdminProtectedRoute>
+  )
+},
+{
+  path: "/admin/Orders",
+  element: (
+    <AdminProtectedRoute>
+      <OrdersComponent />
+    </AdminProtectedRoute>
+  )
+},
     /*  {
       path:"/admin/settings",
       element:<SettingsComponent/>

@@ -6,7 +6,7 @@ import { NavLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import axios from "axios";
 import { useTranslation } from 'react-i18next';
-
+import fortisLogo from '../pages/admin/assets/FORTIS-01.svg';
 export default function Layout() {
   const fontClasses = {
     heading: "font-['Playfair_Display'] font-bold",
@@ -88,9 +88,9 @@ export default function Layout() {
                 
                   <NavLink to="/" className="flex-shrink-0">
                     <img
-                      src="FORTIS-01.png"
+                      src={fortisLogo}
                       alt="Fortis Logo"
-                      style={{position:"absolute",marginTop:"-22vh",left:"-5vh"}}
+                      style={{height:"10vh"}}
                       className="h-26 md:h-22 w-auto max-w-[220px] md:max-w-[280px] object-contain transform hover:scale-105 transition-transform duration-200"
                     />
                   </NavLink>

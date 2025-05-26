@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import fortisLogo from './assets/FORTIS-01.svg';
 import {
   FiShoppingCart, FiUsers, FiDollarSign, FiPrinter, FiPieChart,
   FiSettings, FiLogOut, FiMenu, FiX, FiSearch, FiEdit, FiTrash2,
@@ -12,6 +13,7 @@ import NotificationCenter from './Notificationscenter';
 import { motion, AnimatePresence } from 'framer-motion';
 import ProductEditForm from './ProductEdit';
 import OutOfStockProducts from './OutofStock';
+import { useNavigate } from 'react-router-dom';
 // Font classes consistent with your store
 const fontClasses = {
   heading: "font-['Playfair_Display'] font-bold",
@@ -19,8 +21,33 @@ const fontClasses = {
   body: "font-['Open_Sans']",
   nav: "font-['Raleway'] font-medium"
 };
+const ProfileDropdown = ({ admin, onLogout }) => {
+  return (
+    <motion.div
+      className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50"
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.2 }}
+    >
+      <div className="px-4 py-2 border-b border-gray-100">
+        <p className="text-sm font-medium text-gray-900">{admin?.name}</p>
+        <p className="text-xs text-gray-500 truncate">{admin?.email}</p>
+      </div>
+      <button
+        onClick={onLogout}
+        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+      >
+        <FiLogOut className="mr-2" />
+        Logout
+      </button>
+    </motion.div>
+  );
+};
 
 const AdminDashboard = () => {
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+
   const { t, i18n } = useTranslation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
@@ -39,7 +66,10 @@ const AdminDashboard = () => {
   //edit product form 
   const [editingProduct, setEditingProduct] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-
+  const handleLogout = () => {
+    sessionStorage.removeItem("adminToken");
+    navigate("/login");
+  };
   const handleSaveProduct = async (updatedData) => {
     try {
       // Call your API to update the product
@@ -510,7 +540,8 @@ const AdminDashboard = () => {
       }
     }
   };
-
+  const [admin, setAdmin] = useState({});
+  const navigate = useNavigate()
   const backdropVariants = {
     hidden: { opacity: 0 },
     visible: { opacity: 0.75 }
@@ -568,7 +599,54 @@ const AdminDashboard = () => {
       setIsSubmitting(false);
     }
   };
+  ////////////////////Profile and logout features 
+  /* const [admin, setAdmin] = useState(null);
+  const navigate = useNavigate()
+    useEffect(() => {
+      const token = sessionStorage.getItem("adminToken");
+      if (!token) {
+        navigate("/login");
+        return;
+      }
+  
+      axios.get("http://localhost:8000/api/admin/profile", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        setAdmin(res.data.admin); // حسب شكل response ديالك
+      })
+      .catch((err) => {
+        console.error("Error fetching admin profile:", err);
+        sessionStorage.removeItem("adminToken");
+        navigate("/admin/login");
+      });
+    }, []);
+  
+    const handleLogout = () => {
+      sessionStorage.removeItem("adminToken");
+      navigate("/admin/login");
+    }; */
+  ///////////////////////Profile and logout features end
+  const token = sessionStorage.getItem("adminToken");
 
+  useEffect(() => {
+    axios
+      .get("http://localhost:8000/api/user", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        setAdmin(res.data);
+      })
+      .catch((err) => {
+        console.error("Error fetching admin profile:", err);
+        sessionStorage.removeItem("adminToken");
+        navigate("/admin/login");
+      });
+  }, []); // ✅ had [] katdman ttsal gha marra wa7da
   return (
     <div className={`flex h-screen bg-gray-100 ${i18n.language === 'ar' ? 'text-right' : 'text-left'}`}>
       <Toaster
@@ -715,7 +793,7 @@ const AdminDashboard = () => {
                 AR
               </button>
             </div>
-            <button className="w-full flex items-center p-3 rounded-lg hover:bg-indigo-700">
+            <button className="w-full flex items-center p-3 rounded-lg hover:bg-indigo-700" onClick={handleLogout}>
               <FiLogOut className="mr-3" />
               {t('logout')}
             </button>
@@ -726,8 +804,8 @@ const AdminDashboard = () => {
       {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top header */}
-        <header className="bg-white shadow-sm z-10">
-          <div className="flex items-center justify-between p-4">
+        <header className="bg-white shadow-sm ">
+          <div className="flex items-center justify-between py-2 px-4">
             <div className="flex items-center">
               <button
                 className="mr-4 text-gray-600 lg:hidden"
@@ -742,10 +820,10 @@ const AdminDashboard = () => {
                 <FiMenu size={24} />
               </button>
               <h1 className="text-lg sm:text-xl font-semibold text-gray-800 truncate">
-                {activeTab === 'orders' && t('orderManagement')}
-                {activeTab === 'dashboard' && t('dashboard')}
-                {activeTab === 'products' && t('products')}
-                {activeTab === 'settings' && t('storeSettings')}
+                {activeTab === 'orders' && <img src={fortisLogo} alt="Logo" style={{  width: "20vh"  }} />}
+                {activeTab === 'dashboard' &&  <img src={fortisLogo} alt="Logo" style={{  width: "20vh"  }} />}
+                {activeTab === 'products' &&<img src={fortisLogo} alt="Logo" style={{  width: "20vh"  }} />}
+                {activeTab === 'settings' && <img src={fortisLogo} alt="Logo" style={{ width: "20vh"  }} />}
               </h1>
             </div>
             <div className="flex items-center space-x-2 sm:space-x-4">
@@ -762,13 +840,40 @@ const AdminDashboard = () => {
 
               <NotificationCenter API_URL={API_URL} />
 
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white font-semibold">
-                AD
+              <div className="relative">
+                <button
+                  className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white font-semibold hover:bg-indigo-700 transition-colors"
+                  onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+                  onMouseEnter={() => setShowProfileDropdown(true)}
+                  onMouseLeave={() => setShowProfileDropdown(false)}
+                >
+                  {admin?.name?.charAt(0)?.toUpperCase() || 'A'}
+                </button>
+
+                <AnimatePresence>
+                  {showProfileDropdown && (
+                    <div
+                      className="fixed inset-0 z-40"
+                      onClick={() => setShowProfileDropdown(false)}
+                    >
+                      <motion.div
+                        className="absolute right-4 mt-2 z-50"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onMouseEnter={() => setShowProfileDropdown(true)}
+                        onMouseLeave={() => setShowProfileDropdown(false)}
+                      >
+                        <ProfileDropdown admin={admin} onLogout={handleLogout} />
+                      </motion.div>
+                    </div>
+                  )}
+                </AnimatePresence>
               </div>
             </div>
           </div>
           {/* Mobile search bar */}
-          <div className="px-4 pb-4 sm:hidden">
+          <div className="px-4 pb-4 sm:hidden ">
             <div className="relative">
               <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <input
