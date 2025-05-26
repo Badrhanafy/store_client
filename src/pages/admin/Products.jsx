@@ -239,6 +239,7 @@ const SettingsComponent = ({
                 onClick={() => setMobileSidebarOpen(!mobileSidebarOpen)}
               >
                 <FiMenu size={24} />
+                {/* just for commit */}
               </button>
               <button
                 className="hidden lg:block mr-4 text-gray-600"
