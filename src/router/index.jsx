@@ -23,6 +23,8 @@ import SettingsComponent from "../pages/admin/Settings"
 import ForgotResetPassword from "../pages/PwdReset"
 import AdminProtectedRoute from "../pages/admin/AdminProtectedroutes"
 import AdminProfile from "../pages/admin/Profile"
+import AccountComponent from "../pages/account"
+import Account from "../pages/account"
 export const router = createBrowserRouter([
   {
     element : <Layout/>,
@@ -82,6 +84,10 @@ export const router = createBrowserRouter([
        {
         path : '/PasswoRdreset',
         element: <ForgotResetPassword/>
+      },
+      {
+        path : '/account/:id',
+        element: <Account/>
       },
        
       
