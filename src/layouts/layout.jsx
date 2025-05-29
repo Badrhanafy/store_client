@@ -383,7 +383,7 @@ export default function Layout() {
                       </li>
                       <li>
                         <NavLink
-                          to="/orders"
+                          to={`/orders/${user.phone}`}
                           className="flex items-center p-3 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors"
                           onClick={toggleUserPanel}
                         >

@@ -25,6 +25,7 @@ import AdminProtectedRoute from "../pages/admin/AdminProtectedroutes"
 import AdminProfile from "../pages/admin/Profile"
 import AccountComponent from "../pages/account"
 import Account from "../pages/account"
+import UserOrders from "../pages/Userordershistory"
 export const router = createBrowserRouter([
   {
     element : <Layout/>,
@@ -88,6 +89,10 @@ export const router = createBrowserRouter([
       {
         path : '/account/:id',
         element: <Account/>
+      },
+      {
+        path : '/orders/:phone',
+        element: <UserOrders/>
       },
        
       

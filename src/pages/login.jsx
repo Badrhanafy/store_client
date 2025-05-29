@@ -15,7 +15,7 @@ const AuthForm = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isHovered, setIsHovered] = useState(false);
-
+const [phone,setphone]=useState(null)
   useEffect(() => {
     setError("");
     setSuccess("");
@@ -29,7 +29,7 @@ const AuthForm = () => {
 
     try {
       const endpoint = isLogin ? "login" : "register";
-      const payload = isLogin ? { email, password } : { name, email, password };
+      const payload = isLogin ? { email, password } : { name, email, password ,phone };
 
       const res = await axios.post(`http://localhost:8000/api/${endpoint}`, payload);
 
@@ -215,6 +215,35 @@ const AuthForm = () => {
                       placeholder="John Doe"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
+                      className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition text-gray-700 placeholder-gray-400"
+                      required
+                    />
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+              {!isLogin && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="space-y-1"
+                >
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                   phone number
+                  </label>
+                  <div className="relative">
+                    <input
+                      id="name"
+                      type="text"
+                      placeholder="number"
+                      value={phone}
+                      onChange={(e) => setphone(e.target.value)}
                       className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition text-gray-700 placeholder-gray-400"
                       required
                     />
