@@ -1,0 +1,31 @@
+[33m4db48b0[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m auth sanctum done project v5.9
+[33m42a5c42[m the notification part when new client registers it appears in the admin norification project v05.3
+[33m2512ca8[m enhanced outOfStock feature , it shows up only when there is at least one product out of stock !
+[33mc36c96a[m amelioration de dashboard ajout de panneau out of stock products , project v5.2
+[33m4003a31[m project v05
+[33m948d67d[m just for commit
+[33m07ed7cb[m reset passwort incompleted
+[33m6fdab6e[m project v05
+[33mfe89c92[m enhanced dashboard for admin part , now filters are set with status and newest or oldest , we can say project v04.9
+[33md6d389f[m frontpart v04.5
+[33maefb7b6[m tyle enhancment admin part
+[33m4a1cb52[m project v04.4 dashboard admin upgrade style of details form of orders
+[33m4784a09[m project v04.2 added order details form
+[33m9611e45[m project v04.1 addproducts from dashboard
+[33me23e394[m project v04
+[33me71cbe6[m style home updated , and multi sizes product ucreate
+[33mc6c47ea[m just for save
+[33m8a6c2f5[m trying to update the admin dashbord links
+[33me423ea4[m translation in admin dashboard and multiItem orders
+[33m1663f2b[m added dashboard for admin first impression
+[33mb196c9f[m added changement for login push
+[33m8b3da7f[m pushed login
+[33mc8e9660[m added login admin dashboard
+[33m2482ad2[m kida2 2 hhh
+[33mbca0bea[m khida3 hhh
+[33maeadf91[m added translation and a small design enhancement
+[33m138e39f[m added translation to arabic french and english
+[33m4298084[m added tabIcon in index.html and also review submit part with stars
+[33mbb4d74e[m trying to adjust cattegories filter to get the collections div
+[33mbea20f4[m homepage with slider and details page also upload images
+[33m36d4a90[m Initialize project using Create React App

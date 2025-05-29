@@ -6,18 +6,27 @@ import { useTranslation } from 'react-i18next';
 
 const NotificationCenter = ({ API_URL }) => {
   const { t } = useTranslation();
-  const [notifications, setNotifications] = useState([]);
-  const [unreadCount, setUnreadCount] = useState(0);
+  const [notificationData, setNotificationData] = useState({
+    notifications: [],
+    unread_count: 0
+  });
   const [showNotifications, setShowNotifications] = useState(false);
   const [loading, setLoading] = useState(false);
+  const token = sessionStorage.getItem('adminToken');
 
   // Fetch notifications from the backend
   const fetchNotifications = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_URL}/admin/notifications`);
-      setNotifications(response.data);
-      setUnreadCount(response.data.filter(n => !n.read).length);
+      const response = await axios.get(`${API_URL}/admin/notifications`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setNotificationData({
+        notifications: response.data.notifications.data,
+        unread_count: response.data.unread_count
+      });
     } catch (error) {
       console.error('Error fetching notifications:', error);
     } finally {
@@ -34,11 +43,18 @@ const NotificationCenter = ({ API_URL }) => {
 
   const markAsRead = async (id) => {
     try {
-      await axios.patch(`${API_URL}/admin/notifications/${id}/read`);
-      setNotifications(prev => 
-        prev.map(n => n.id === id ? { ...n, read: true } : n)
-      );
-      setUnreadCount(prev => prev - 1);
+      await axios.patch(`${API_URL}/admin/notifications/${id}/read`, null, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setNotificationData(prev => ({
+        ...prev,
+        notifications: prev.notifications.map(n => 
+          n.id === id ? { ...n, read_at: new Date().toISOString() } : n
+        ),
+        unread_count: prev.unread_count - 1
+      }));
     } catch (error) {
       console.error('Error marking notification as read:', error);
     }
@@ -46,12 +62,32 @@ const NotificationCenter = ({ API_URL }) => {
 
   const markAllAsRead = async () => {
     try {
-      await axios.patch(`${API_URL}/admin/notifications/mark-all-read`);
-      setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-      setUnreadCount(0);
+      await axios.patch(`${API_URL}/admin/notifications/mark-all-read`, null, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setNotificationData(prev => ({
+        ...prev,
+        notifications: prev.notifications.map(n => ({ 
+          ...n, 
+          read_at: new Date().toISOString() 
+        })),
+        unread_count: 0
+      }));
     } catch (error) {
       console.error('Error marking all as read:', error);
     }
+  };
+
+  const formatNotification = (notification) => {
+    return {
+      id: notification.id,
+      type: notification.data.type,
+      message: notification.data.message,
+      created_at: notification.data.timestamp || notification.created_at,
+      read: !!notification.read_at
+    };
   };
 
   return (
@@ -61,9 +97,9 @@ const NotificationCenter = ({ API_URL }) => {
         className="p-2 rounded-full hover:bg-gray-200 transition-colors relative"
       >
         <FiBell size={20} />
-        {unreadCount > 0 && (
+        {notificationData.unread_count > 0 && (
           <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-            {unreadCount}
+            {notificationData.unread_count}
           </span>
         )}
       </button>
@@ -86,41 +122,44 @@ const NotificationCenter = ({ API_URL }) => {
             <div className="max-h-60 overflow-y-auto">
               {loading ? (
                 <div className="p-4 text-center text-gray-500">Loading...</div>
-              ) : notifications.length === 0 ? (
+              ) : notificationData.notifications.length === 0 ? (
                 <div className="p-4 text-center text-gray-500">{t('noNotifications')}</div>
               ) : (
-                notifications.map((notification) => (
-                  <div
-                    key={notification.id}
-                    className={`p-3 border-b border-gray-100 cursor-pointer ${!notification.read ? 'bg-blue-50' : ''}`}
-                    onClick={() => markAsRead(notification.id)}
-                  >
-                    <div className="flex items-start">
-                      <div className="flex-shrink-0 pt-1">
-                        {notification.type === 'new_client' ? (
-                          <FiUsers className="text-indigo-500" />
-                        ) : (
-                          <FiBell className="text-indigo-500" />
+                notificationData.notifications.map((notification) => {
+                  const formattedNotification = formatNotification(notification);
+                  return (
+                    <div
+                      key={notification.id}
+                      className={`p-3 border-b border-gray-100 cursor-pointer ${!formattedNotification.read ? 'bg-blue-50' : ''}`}
+                      onClick={() => markAsRead(notification.id)}
+                    >
+                      <div className="flex items-start">
+                        <div className="flex-shrink-0 pt-1">
+                          {formattedNotification.type === 'new_user' ? (
+                            <FiUsers className="text-indigo-500" />
+                          ) : (
+                            <FiBell className="text-indigo-500" />
+                          )}
+                        </div>
+                        <div className="ml-3 flex-1">
+                          <p className="text-sm font-medium text-gray-900">
+                            {formattedNotification.message}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {new Date(formattedNotification.created_at).toLocaleString()}
+                          </p>
+                        </div>
+                        {!formattedNotification.read && (
+                          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                         )}
                       </div>
-                      <div className="ml-3 flex-1">
-                        <p className="text-sm font-medium text-gray-900">
-                          {notification.message}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {new Date(notification.created_at).toLocaleString()}
-                        </p>
-                      </div>
-                      {!notification.read && (
-                        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                      )}
                     </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
             
-            {notifications.length > 0 && (
+            {notificationData.notifications.length > 0 && (
               <div className="p-2 border-t border-gray-200 text-center">
                 <button
                   onClick={markAllAsRead}
