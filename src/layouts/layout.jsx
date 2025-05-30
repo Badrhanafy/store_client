@@ -28,34 +28,26 @@ export default function Layout() {
   const userPanelRef = useRef(null);
   const id = 2;
   const navigate = useNavigate()
-  const [user,setuser]= useState({})
+  const [user, setUser] = useState({})
   const token = sessionStorage.getItem("UserToken")
-  console.log(user.name);
   
   useEffect(() => {
-    axios
-      .get("http://localhost:8000/api/user", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((res) => {
-        setuser(res.data);
-
-      })
-      .catch((err) => {
-        console.error("Error fetching admin profile:", err);
-        sessionStorage.removeItem("adminToken");
-        
-      });
-  }, []);
-  // Sample user data (replace with actual user data from your auth system)
-  const [currentUser, setCurrentUser] = useState({
-    name: "John Doe",
-    email: "john@example.com",
-    isLoggedIn: true,
-    avatar: "https://randomuser.me/api/portraits/men/32.jpg"
-  });
+    if (token) {
+      axios
+        .get("http://localhost:8000/api/user", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((res) => {
+          setUser(res.data);
+        })
+        .catch((err) => {
+          console.error("Error fetching user profile:", err);
+          sessionStorage.removeItem("UserToken");
+        });
+    }
+  }, [token]);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -80,14 +72,18 @@ export default function Layout() {
   };
 
   const toggleUserPanel = () => {
+    if (!token) {
+      // Show a message or tooltip that user needs to login
+      return;
+    }
     setIsUserPanelOpen(!isUserPanelOpen);
   };
 
   const handleLogout = () => {
-    // Add your logout logic here
-    console.log("User logged out");
-    setCurrentUser({ ...currentUser, isLoggedIn: false });
+    sessionStorage.removeItem("UserToken");
+    setUser({});
     setIsUserPanelOpen(false);
+    navigate('/');
   };
 
   const changeLanguage = (lng) => {
@@ -127,7 +123,6 @@ export default function Layout() {
       return <div className='bg-red-400'>  {produit.price}</div>
     })
   };
-
 
   const navLinks = [
     { to: "/", text: "Home" },
@@ -244,17 +239,32 @@ export default function Layout() {
                   </NavLink>
                 </div>
                 
-                {/* User Icon */}
-                <div className="relative">
+                {/* User Icon with login requirement */}
+                <div className="relative group">
                   <button 
                     onClick={toggleUserPanel}
                     className="p-2 text-gray-600 hover:text-indigo-600 transition-colors relative"
                   >
                     <FiUser size={20} />
-                    {currentUser.isLoggedIn && (
+                    {token && (
                       <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-green-500 ring-2 ring-white"></span>
                     )}
                   </button>
+                  {!token && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50 border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                      <div className="px-4 py-2 text-sm text-gray-700">
+                        Please login to access your account and order history
+                      </div>
+                      <div className="border-t border-gray-100 py-1">
+                        <NavLink
+                          to="/login"
+                          className="block px-4 py-2 text-sm text-indigo-600 hover:bg-indigo-50"
+                        >
+                          Login
+                        </NavLink>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -320,9 +330,9 @@ export default function Layout() {
           )}
         </AnimatePresence>
 
-        {/* User Account Sidebar */}
+        {/* User Account Sidebar - Only shown if token exists */}
         <AnimatePresence>
-          {isUserPanelOpen && (
+          {isUserPanelOpen && token && (
             <>
               {/* Overlay */}
               <motion.div
@@ -357,14 +367,12 @@ export default function Layout() {
 
                   {/* User Profile */}
                   <div className="flex items-center mb-8 pb-6 border-b border-gray-200">
-                    <img
-                      src={currentUser.avatar}
-                      alt="User avatar"
-                      className="w-16 h-16 rounded-full object-cover mr-4"
-                    />
+                    <div className="w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center mr-4">
+                      <FiUser size={24} className="text-indigo-600" />
+                    </div>
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-800">{user.name}</h3>
-                      <p className="text-gray-600">{user.email}</p>
+                      <h3 className="text-lg font-semibold text-gray-800">{user.name || 'User'}</h3>
+                      <p className="text-gray-600">{user.email || ''}</p>
                     </div>
                   </div>
 
@@ -373,7 +381,7 @@ export default function Layout() {
                     <ul className="space-y-2">
                       <li>
                         <NavLink
-                          to={`/account/${user.id}`}
+                          to="/account/profile"
                           className="flex items-center p-3 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors"
                           onClick={toggleUserPanel}
                         >
@@ -383,7 +391,7 @@ export default function Layout() {
                       </li>
                       <li>
                         <NavLink
-                          to={`/orders/${user.phone}`}
+                          to={`orders/${user.phone}`}
                           className="flex items-center p-3 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors"
                           onClick={toggleUserPanel}
                         >
@@ -393,7 +401,7 @@ export default function Layout() {
                       </li>
                       <li>
                         <NavLink
-                          to="/wishlist"
+                          to="/account/wishlist"
                           className="flex items-center p-3 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors"
                           onClick={toggleUserPanel}
                         >
@@ -403,7 +411,7 @@ export default function Layout() {
                       </li>
                       <li>
                         <NavLink
-                          to="/settings"
+                          to="/account/settings"
                           className="flex items-center p-3 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors"
                           onClick={toggleUserPanel}
                         >
@@ -416,32 +424,13 @@ export default function Layout() {
 
                   {/* Footer */}
                   <div className="mt-auto pt-6 border-t border-gray-200">
-                    {currentUser.isLoggedIn ? (
-                      <button
-                        onClick={handleLogout}
-                        className="w-full flex items-center justify-center p-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                      >
-                        <FiLogOut className="mr-3" size={20} />
-                        <span>Sign Out</span>
-                      </button>
-                    ) : (
-                      <div className="space-y-3">
-                        <NavLink
-                          to="/login"
-                          className="block w-full text-center p-3 bg-indigo-600 text-white hover:bg-indigo-700 rounded-lg transition-colors"
-                          onClick={toggleUserPanel}
-                        >
-                          Login
-                        </NavLink>
-                        <NavLink
-                          to="/register"
-                          className="block w-full text-center p-3 border border-indigo-600 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
-                          onClick={toggleUserPanel}
-                        >
-                          Create Account
-                        </NavLink>
-                      </div>
-                    )}
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center justify-center p-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    >
+                      <FiLogOut className="mr-3" size={20} />
+                      <span>Sign Out</span>
+                    </button>
                   </div>
                 </div>
               </motion.div>
@@ -542,9 +531,28 @@ export default function Layout() {
 
                   {/* Mobile Icons */}
                   <div className="flex items-center justify-around py-6 border-t border-gray-800">
-                    <button className="p-2 text-white hover:text-indigo-400">
-                      <FiUser size={24} />
-                    </button>
+                    <div className="group relative">
+                      <button 
+                        className="p-2 text-white hover:text-indigo-400"
+                        onClick={() => {
+                          if (!token) {
+                            navigate('/login');
+                            toggleMenu();
+                          } else {
+                            toggleUserPanel();
+                          }
+                        }}
+                      >
+                        <FiUser size={24} />
+                      </button>
+                      {!token && (
+                        <div className="absolute left-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                          <div className="px-4 py-2 text-sm text-white">
+                            Login to view your account
+                          </div>
+                        </div>
+                      )}
+                    </div>
                     <button className="p-2 text-white hover:text-indigo-400">
                       <FiHeart size={24} />
                     </button>

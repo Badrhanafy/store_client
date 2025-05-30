@@ -66,3 +66,7 @@
 
 
 /* select styles */
+@font-face {
+  font-family: "Inter";
+  src: url('../public/fonts/Inter-Bold.otf');
+}
