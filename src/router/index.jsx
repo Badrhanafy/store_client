@@ -26,6 +26,7 @@ import AdminProfile from "../pages/admin/Profile"
 import AccountComponent from "../pages/account"
 import Account from "../pages/account"
 import UserOrders from "../pages/Userordershistory"
+import Wishlist from "../pages/WishListePage"
 export const router = createBrowserRouter([
   {
     element : <Layout/>,
@@ -93,6 +94,10 @@ export const router = createBrowserRouter([
       {
         path : '/orders/:phone',
         element: <UserOrders/>
+      },
+      {
+        path : '/whishlist',
+        element: <Wishlist/>
       },
        
       

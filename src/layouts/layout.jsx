@@ -3,12 +3,15 @@ import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../pages/CartContext';
 import { FiSearch, FiUser, FiHeart, FiShoppingBag, FiMenu, FiX, FiGlobe, FiChevronDown, FiLogOut, FiSettings, FiShoppingCart, FiStar } from 'react-icons/fi';
 import { NavLink } from 'react-router-dom';
+import { useContext } from 'react';
+import { WishlistContext } from '../context/Wishlistecontext';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from "axios";
 import { useTranslation } from 'react-i18next';
 import fortisLogo from '../pages/admin/assets/FORTIS-01.svg';
 
 export default function Layout() {
+  const { wishlist } = useContext(WishlistContext);
   const fontClasses = {
     heading: "font-['Playfair_Display'] font-bold",
     subheading: "font-['Montserrat'] font-medium",
@@ -135,7 +138,7 @@ export default function Layout() {
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     if (searchResults.length > 0) {
-      navigate(`/product/${searchResults[0].id}`);
+      /*  navigate(`/product/${searchResults[0].id}`); */
       handleSearchClose();
     }
   };
@@ -233,9 +236,14 @@ export default function Layout() {
                   )}
                 </div>
 
-                <button className="p-2 text-gray-600 hover:text-indigo-600 transition-colors">
-                  <FiHeart size={20} />
-                </button>
+                <NavLink to="/whishlist" className="relative">
+                  <FiHeart />
+                  {wishlist.length > 0 && (
+                    <span className="absolute -top-3 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                      {wishlist.length}
+                    </span>
+                  )}
+                </NavLink>
 
                 <div className="p-2 text-gray-600 hover:text-indigo-600 transition-colors relative">
                   <NavLink to="/cart">
@@ -243,7 +251,7 @@ export default function Layout() {
                       <div className="relative">
                         <FiShoppingBag size={20} className={isActive ? 'text-indigo-600' : ''} />
                         {cartCount > 0 && (
-                          <span className="absolute -top-1 -right-1 bg-indigo-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                          <span className="absolute -top-3 -right-1 bg-indigo-600 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
                             {cartCount}
                           </span>
                         )}
@@ -251,9 +259,9 @@ export default function Layout() {
                     )}
                   </NavLink>
                 </div>
-                
+
                 <div className="relative group">
-                  <button 
+                  <button
                     onClick={toggleUserPanel}
                     className="p-2 text-gray-600 hover:text-indigo-600 transition-colors relative"
                   >
@@ -315,7 +323,7 @@ export default function Layout() {
               >
                 <div className="max-w-3xl mx-auto relative" ref={searchResultsRef}>
                   <motion.div
-                    animate={searchResults.length > 0 ? { 
+                    animate={searchResults.length > 0 ? {
                       y: -100,
                       transition: { type: 'spring', damping: 15, stiffness: 300 }
                     } : {}}
@@ -326,7 +334,7 @@ export default function Layout() {
                         type="text"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        
+
                         placeholder={t("Search products...")}
                         className="w-full px-6 py-5 text-xl md:text-2xl text-yellow-200  animation-color duration-500 focus:text-white focus:ring-yellow-200 focus:bg-black/50  rounded-sm bg-yellow-500/10 shadow-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
                         autoFocus
@@ -357,8 +365,8 @@ export default function Layout() {
                           whileHover={{ scale: 1.03 }}
                           className="relative group rounded-xl overflow-hidden shadow-lg bg-white"
                         >
-                          <Link 
-                            to={`AllProducts/product/${product.id}`} 
+                          <Link
+                            to={`AllProducts/product/${product.id}`}
                             className="absolute inset-0 z-10"
                             onClick={handleSearchClose}
                           />
@@ -408,7 +416,7 @@ export default function Layout() {
                 className="fixed inset-0 bg-black z-50"
                 onClick={toggleUserPanel}
               />
-              
+
               <motion.div
                 ref={userPanelRef}
                 initial={{ x: '100%' }}
@@ -550,13 +558,13 @@ export default function Layout() {
                         <FiSearch size={20} />
                       </button>
                     </form>
-                    
+
                     {searchResults.length > 0 && (
                       <div className="mt-4 space-y-2 max-h-[50vh] overflow-y-auto">
                         {searchResults.map(product => (
                           <Link
                             key={product.id}
-                            to={`/product/${product.id}`}
+                            to={`ApllProducts/product/${product.id}`}
                             className="block relative group"
                             onClick={toggleMenu}
                           >

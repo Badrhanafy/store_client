@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useCart } from './CartContext';
 import { t } from 'i18next';
+import { WishlistContext } from '../context/Wishlistecontext';
+import { useContext } from 'react';
 // Font classes (consistent with homepage)
 const fontClasses = {
   heading: "font-['Playfair_Display'] font-bold",
@@ -12,7 +14,8 @@ const fontClasses = {
   body: "font-['Open_Sans']",
   nav: "font-['Raleway'] font-medium"
 };
-const baseurl='http://localhost:8000'
+
+const baseurl = 'http://localhost:8000'
 // Notification Component
 const Notification = ({ message, onClose }) => (
   <motion.div
@@ -54,7 +57,16 @@ const ProductCard = ({ product, onAddToCart, hoveredProduct, setHoveredProduct }
     onAddToCart(product);
     addToCart(product);
   };
+  const { wishlist, addToWishlist, removeFromWishlist } = useContext(WishlistContext);
+  const isInWishlist = wishlist.some(item => item.id === product.id);
 
+  const handleWishlist = () => {
+    if (isInWishlist) {
+      removeFromWishlist(product.id);
+    } else {
+      addToWishlist(product);
+    }
+  };
   return (
     <motion.div
       className="group relative bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300"
@@ -71,9 +83,14 @@ const ProductCard = ({ product, onAddToCart, hoveredProduct, setHoveredProduct }
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
 
-        <div className={`absolute top-4 right-4 flex flex-col space-y-2 transition-all duration-300 ${hoveredProduct === product.id ? 'opacity-100' : 'opacity-0'}`}>
-          <button className="bg-white p-2 rounded-full shadow-md hover:bg-gray-100 transition-colors">
-            <FiHeart className="text-gray-700" />
+        <div className={`absolute top-4 right-4 flex flex-col  space-y-2 transition-all duration-300 ${hoveredProduct === product.id ? 'opacity-100' : 'opacity-0'}`} >
+          <button
+            onClick={handleWishlist}
+            className="absolute top-2 right-2 p-2 bg-white/80 rounded-full mt-8 ml-16"
+          >
+            <FiHeart
+              className={`text-lg ${isInWishlist ? 'fill-red-500 text-red-500' : 'text-gray-600'}`}
+            />
           </button>
           <button
             onClick={handleAddToCart}
@@ -222,7 +239,7 @@ export default function ProductList() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {products.map((product) => (
-            <ProductCard 
+            <ProductCard
               key={product.id}
               product={product}
               onAddToCart={handleAddToCart}
