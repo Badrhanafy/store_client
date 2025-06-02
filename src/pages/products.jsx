@@ -12,7 +12,7 @@ const fontClasses = {
   body: "font-['Open_Sans']",
   nav: "font-['Raleway'] font-medium"
 };
-
+const baseurl='http://localhost:8000'
 // Notification Component
 const Notification = ({ message, onClose }) => (
   <motion.div
@@ -66,7 +66,7 @@ const ProductCard = ({ product, onAddToCart, hoveredProduct, setHoveredProduct }
     >
       <div className="relative overflow-hidden h-64">
         <img
-          src={`http://localhost:8000/${product.image}`}
+          src={`${baseurl}/${product.image}`}
           alt={product.title}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
@@ -151,7 +151,7 @@ export default function ProductList() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await axios.get('http://localhost:8000/api/products');
+        const res = await axios.get(`${baseurl}/api/products`);
         setProducts(res.data);
       } catch (err) {
         console.error(err);

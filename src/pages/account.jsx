@@ -43,13 +43,13 @@ const Account = () => {
       try {
         const response = await axios.get(`http://localhost:8000/api/users/${id}`);
         setUser(response.data);
-        reset({
+     /*    reset({
           name: response.data.name,
           email: response.data.email,
           phone: response.data.phone,
           address: response.data.address,
           role: response.data.role
-        });
+        }); */
       } catch (error) {
         toast.error('Failed to fetch profile data', {
           position: 'top-right',
@@ -60,14 +60,14 @@ const Account = () => {
           draggable: true,
           className: 'bg-gray-900 text-white'
         });
-        navigate('/');
+        alert("do not know why !")//navigate
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchUser();
-  }, [id, reset, navigate]);
+  }, [id, reset]);
 
   // Handle image preview
   useEffect(() => {
@@ -93,7 +93,7 @@ const Account = () => {
         formData.append('profileImage', profileImage);
       }
 
-      const response = await axios.put(`/api/users/${id}`, formData, {
+      const response = await axios.put(`http://localhost:8000/api/users/${id}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }

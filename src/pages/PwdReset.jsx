@@ -28,7 +28,7 @@ const handleForgotPassword = async (e) => {
   setError('');
   
   try {
-    const response = await axios.post('http://localhost:8000/api/forgot-password', { email });
+    const response = await axios.post('hhttp://192.168.56.1:8000/api/forgot-password', { email });
     setSuccess(response.data.message || 'Password reset link sent to your email');
   } catch (err) {
     setError(err.response?.data?.error || 'Failed to send reset link');
@@ -50,7 +50,7 @@ const handleResetPassword = async (e) => {
   }
 
   try {
-    const response = await axios.post('http://localhost:8000/api/reset-password', { 
+    const response = await axios.post('hhttp://192.168.56.1:8000/api/reset-password', { 
       token, 
       email,
       password: newPassword,

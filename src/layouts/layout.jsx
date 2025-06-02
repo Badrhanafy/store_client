@@ -15,7 +15,7 @@ export default function Layout() {
     body: "font-['Open_Sans']",
     nav: "font-['Raleway'] font-medium"
   };
-
+  const baseurl = 'http://localhost:8000';
   const { t, i18n } = useTranslation();
   const { cartCount } = useCart();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -24,17 +24,19 @@ export default function Layout() {
   const [isUserPanelOpen, setIsUserPanelOpen] = useState(false);
   const [products, setProducts] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
   const searchInputRef = useRef(null);
   const userPanelRef = useRef(null);
+  const searchResultsRef = useRef(null);
   const id = 2;
-  const navigate = useNavigate()
-  const [user, setUser] = useState({})
-  const token = sessionStorage.getItem("UserToken")
-  
+  const navigate = useNavigate();
+  const [user, setUser] = useState({});
+  const token = sessionStorage.getItem("UserToken");
+
   useEffect(() => {
     if (token) {
       axios
-        .get("http://localhost:8000/api/user", {
+        .get(`${baseurl}/api/user`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -65,6 +67,7 @@ export default function Layout() {
   const handleSearchClose = () => {
     setIsSearchOpen(false);
     setSearchQuery('');
+    setSearchResults([]);
   };
 
   const toggleLanguage = () => {
@@ -73,7 +76,6 @@ export default function Layout() {
 
   const toggleUserPanel = () => {
     if (!token) {
-      // Show a message or tooltip that user needs to login
       return;
     }
     setIsUserPanelOpen(!isUserPanelOpen);
@@ -97,31 +99,50 @@ export default function Layout() {
   };
 
   useEffect(() => {
-    axios.get("http://127.0.0.1:8000/api/products").then(
+    axios.get(`${baseurl}/api/products`).then(
       res => setProducts(res.data))
   }, [id]);
 
-  // Close panels when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (userPanelRef.current && !userPanelRef.current.contains(event.target)) {
         setIsUserPanelOpen(false);
+      }
+      if (searchResultsRef.current && isSearchOpen && !searchResultsRef.current.contains(event.target)) {
+        setSearchResults([]);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, []);
+  }, [isSearchOpen]);
+
+  useEffect(() => {
+    if (searchQuery.trim() === '') {
+      setSearchResults([]);
+      return;
+    }
+
+    const results = products.filter(product =>
+      product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (product.description && product.description.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
+
+    setSearchResults(results.slice(0, 8)); // Increased to 8 results for better grid display
+  }, [searchQuery, products]);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    console.log('Searching for:', searchQuery);
-    products.filter((product) => {
-      return product.title === searchQuery
-    }).map((produit, i) => {
-      return <div className='bg-red-400'>  {produit.price}</div>
-    })
+    if (searchResults.length > 0) {
+      navigate(`/product/${searchResults[0].id}`);
+      handleSearchClose();
+    }
+  };
+
+  const handleProductClick = (productId) => {
+    navigate(`/product/${productId}`);
+    handleSearchClose();
   };
 
   const navLinks = [
@@ -134,23 +155,20 @@ export default function Layout() {
   return (
     <div className="relative">
       <header>
-        {/* Main Navigation Bar */}
         <nav className={`${fontClasses.nav} fixed w-full z-40 bg-white shadow-sm`}>
           <div className="container mx-auto px-6 py-4">
             <div className="flex items-center justify-between">
-              {/* Logo */}
               <div className="flex-shrink-0">
                 <NavLink to="/" className="flex-shrink-0">
                   <img
                     src={fortisLogo}
                     alt="Fortis Logo"
-                    style={{height:"10vh"}}
+                    style={{ height: "10vh" }}
                     className="h-26 md:h-22 w-auto max-w-[220px] md:max-w-[280px] object-contain transform hover:scale-105 transition-transform duration-200"
                   />
                 </NavLink>
               </div>
 
-              {/* Desktop Navigation Links */}
               <div className="hidden md:flex items-center space-x-6 flex-1 mx-8 justify-center">
                 {navLinks.map((link) => (
                   <NavLink
@@ -168,9 +186,7 @@ export default function Layout() {
                 ))}
               </div>
 
-              {/* Desktop Icons */}
               <div className="hidden md:flex items-center space-x-4">
-                {/* Search Icon */}
                 <div className="relative">
                   <button
                     onClick={toggleSearch}
@@ -181,7 +197,6 @@ export default function Layout() {
                   </button>
                 </div>
 
-                {/* Language Selector */}
                 <div className="relative">
                   <button
                     onClick={toggleLanguage}
@@ -218,12 +233,10 @@ export default function Layout() {
                   )}
                 </div>
 
-                {/* Wishlist Icon */}
                 <button className="p-2 text-gray-600 hover:text-indigo-600 transition-colors">
                   <FiHeart size={20} />
                 </button>
 
-                {/* Cart Icon */}
                 <div className="p-2 text-gray-600 hover:text-indigo-600 transition-colors relative">
                   <NavLink to="/cart">
                     {({ isActive }) => (
@@ -239,7 +252,6 @@ export default function Layout() {
                   </NavLink>
                 </div>
                 
-                {/* User Icon with login requirement */}
                 <div className="relative group">
                   <button 
                     onClick={toggleUserPanel}
@@ -268,7 +280,6 @@ export default function Layout() {
                 </div>
               </div>
 
-              {/* Mobile Menu Button */}
               <div className="md:hidden flex items-center">
                 <button
                   onClick={toggleMenu}
@@ -282,59 +293,113 @@ export default function Layout() {
           </div>
         </nav>
 
-        {/* Search Overlay */}
+        {/* Enhanced Search Overlay */}
         <AnimatePresence>
           {isSearchOpen && (
             <motion.div
               key="search-overlay"
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
-              className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4"
-              onClick={(e) => {
-                if (e.target === e.currentTarget) {
-                  handleSearchClose();
-                }
-              }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="fixed inset-0 bg-black/60 z-50"
+              onClick={handleSearchClose}
             >
-              <div className="w-full max-w-2xl relative">
-                <form 
-                  onSubmit={handleSearchSubmit}
-                  className="flex items-center border-b-2 border-gray-300 focus-within:border-indigo-600"
-                >
-                  <input
-                    ref={searchInputRef}
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder={t("Search products...")}
-                    className="flex-1 px-6 py-4 text-xl focus:outline-none"
-                    autoFocus
-                  />
-                  <button
-                    type="submit"
-                    className="ml-4 p-2 text-gray-600 hover:text-indigo-600 transition-colors"
+              <motion.div
+                initial={{ y: -50, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: -50, opacity: 0 }}
+                transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+                className="container mx-auto px-4 pt-20 pb-8"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="max-w-3xl mx-auto relative" ref={searchResultsRef}>
+                  <motion.div
+                    animate={searchResults.length > 0 ? { 
+                      y: -100,
+                      transition: { type: 'spring', damping: 15, stiffness: 300 }
+                    } : {}}
                   >
-                    <FiSearch size={24} className='text-yellow-500'/>
-                  </button>
-                </form>
-                <button
-                  onClick={handleSearchClose}
-                  className="absolute top-1/2 right-0 transform -translate-y-1/2 mr-16 p-2 text-gray-600 hover:text-indigo-600 transition-colors"
-                >
-                  <FiX size={24} />
-                </button>
-              </div>
+                    <form onSubmit={handleSearchSubmit} className="relative">
+                      <input
+                        ref={searchInputRef}
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        
+                        placeholder={t("Search products...")}
+                        className="w-full px-6 py-5 text-xl md:text-2xl text-yellow-200  animation-color duration-500 focus:text-white focus:ring-yellow-200 focus:bg-black/50  rounded-sm bg-yellow-500/10 shadow-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                        autoFocus
+                      />
+                      <button
+                        type="submit"
+                        onClick={handleSearchClose}
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 p-2 text-gray-500 hover:text-indigo-600 transition-colors"
+                      >
+                        <FiX size={24} />
+                      </button>
+                    </form>
+                  </motion.div>
+
+                  {searchResults.length > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.1 }}
+                      className="mt-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+                    >
+                      {searchResults.map((product) => (
+                        <motion.div
+                          key={product.id}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ type: 'spring' }}
+                          whileHover={{ scale: 1.03 }}
+                          className="relative group rounded-xl overflow-hidden shadow-lg bg-white"
+                        >
+                          <Link 
+                            to={`AllProducts/product/${product.id}`} 
+                            className="absolute inset-0 z-10"
+                            onClick={handleSearchClose}
+                          />
+                          <div className="aspect-square relative">
+                            {product.image && (
+                              <img
+                                src={`${baseurl}/${product.image}`}
+                                alt={product.title}
+                                className="w-full h-full object-cover"
+                              />
+                            )}
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-all duration-300 flex items-end">
+                              <div className="w-full p-3 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                                <h3 className="text-white font-medium truncate">{product.title}</h3>
+                                <p className="text-indigo-300 font-semibold">${product.price}</p>
+                              </div>
+                            </div>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </motion.div>
+                  )}
+
+                  {searchQuery && searchResults.length === 0 && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="mt-8 text-center"
+                    >
+                      <p className="text-white text-lg">No products found matching "{searchQuery}"</p>
+                    </motion.div>
+                  )}
+                </div>
+              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>
 
-        {/* User Account Sidebar - Only shown if token exists */}
         <AnimatePresence>
           {isUserPanelOpen && token && (
             <>
-              {/* Overlay */}
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 0.5 }}
@@ -344,7 +409,6 @@ export default function Layout() {
                 onClick={toggleUserPanel}
               />
               
-              {/* Sidebar */}
               <motion.div
                 ref={userPanelRef}
                 initial={{ x: '100%' }}
@@ -354,7 +418,6 @@ export default function Layout() {
                 className="fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-xl z-50 overflow-y-auto"
               >
                 <div className="p-6 h-full flex flex-col">
-                  {/* Header */}
                   <div className="flex justify-between items-center mb-8">
                     <h2 className="text-2xl font-bold text-gray-800">My Account</h2>
                     <button
@@ -365,7 +428,6 @@ export default function Layout() {
                     </button>
                   </div>
 
-                  {/* User Profile */}
                   <div className="flex items-center mb-8 pb-6 border-b border-gray-200">
                     <div className="w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center mr-4">
                       <FiUser size={24} className="text-indigo-600" />
@@ -376,12 +438,11 @@ export default function Layout() {
                     </div>
                   </div>
 
-                  {/* Navigation */}
                   <nav className="flex-1">
                     <ul className="space-y-2">
                       <li>
                         <NavLink
-                          to="/account/profile"
+                          to={`/account/${user.id}`}
                           className="flex items-center p-3 text-gray-700 hover:bg-indigo-50 hover:text-indigo-600 rounded-lg transition-colors"
                           onClick={toggleUserPanel}
                         >
@@ -422,7 +483,6 @@ export default function Layout() {
                     </ul>
                   </nav>
 
-                  {/* Footer */}
                   <div className="mt-auto pt-6 border-t border-gray-200">
                     <button
                       onClick={handleLogout}
@@ -438,7 +498,6 @@ export default function Layout() {
           )}
         </AnimatePresence>
 
-        {/* Mobile Sidebar Menu */}
         <AnimatePresence>
           {isMenuOpen && (
             <motion.div
@@ -475,26 +534,53 @@ export default function Layout() {
                     </button>
                   </div>
 
-                  {/* Mobile Search */}
                   <div className="mb-6 px-3">
-                    <form onSubmit={handleSearchSubmit} className="flex bg-gray-800 rounded-lg overflow-hidden">
+                    <form onSubmit={handleSearchSubmit} className="relative">
                       <input
                         type="text"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder={t("Search products...")}
-                        className="px-4 py-3 w-full bg-transparent text-white focus:outline-none"
+                        className="w-full px-4 py-3 bg-gray-800 text-white rounded-lg focus:outline-none focuse:bg-yellow-200 focus:ring-1 focus:ring-indigo-500"
                       />
                       <button
                         type="submit"
-                        className="px-4 text-white hover:bg-gray-700"
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
                       >
                         <FiSearch size={20} />
                       </button>
                     </form>
+                    
+                    {searchResults.length > 0 && (
+                      <div className="mt-4 space-y-2 max-h-[50vh] overflow-y-auto">
+                        {searchResults.map(product => (
+                          <Link
+                            key={product.id}
+                            to={`/product/${product.id}`}
+                            className="block relative group"
+                            onClick={toggleMenu}
+                          >
+                            <div className="flex items-center p-3 bg-gray-800 rounded-lg hover:bg-gray-700 transition-colors">
+                              {product.image && (
+                                <div className="w-12 h-12 mr-3 flex-shrink-0">
+                                  <img
+                                    src={`${baseurl}/${product.image}`}
+                                    alt={product.title}
+                                    className="w-full h-full object-cover rounded"
+                                  />
+                                </div>
+                              )}
+                              <div className="flex-1 min-w-0">
+                                <p className="text-white truncate">{product.title}</p>
+                                <p className="text-indigo-300 text-sm">${product.price}</p>
+                              </div>
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
-                  {/* Mobile Navigation Links */}
                   <div className="flex flex-col space-y-4 flex-1">
                     {navLinks.map((link) => (
                       <NavLink
@@ -513,7 +599,6 @@ export default function Layout() {
                     ))}
                   </div>
 
-                  {/* Mobile Language Selector */}
                   <div className="px-4 py-6">
                     <div className="flex items-center space-x-4">
                       <FiGlobe size={24} className="text-white" />
@@ -529,10 +614,9 @@ export default function Layout() {
                     </div>
                   </div>
 
-                  {/* Mobile Icons */}
                   <div className="flex items-center justify-around py-6 border-t border-gray-800">
                     <div className="group relative">
-                      <button 
+                      <button
                         className="p-2 text-white hover:text-indigo-400"
                         onClick={() => {
                           if (!token) {

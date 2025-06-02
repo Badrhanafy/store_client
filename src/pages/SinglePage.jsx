@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useCart } from './CartContext'; // Adjust the import path as needed
-
+const baseurl='http://localhost:8000'
 const fontClasses = {
   heading: "font-['Playfair_Display'] font-bold",
   subheading: "font-['Montserrat'] font-medium",
@@ -98,7 +98,7 @@ const ImageGallery = ({ images, activeImage, handleImageChange, direction, retur
             className="absolute inset-0"
           >
             <img
-              src={`http://localhost:8000/${images[activeImage]?.image_path}`}
+              src={`${baseurl}/${images[activeImage]?.image_path}`}
               alt="Product"
               className="w-full h-full object-contain"
             />
@@ -133,7 +133,7 @@ const ImageGallery = ({ images, activeImage, handleImageChange, direction, retur
               onClick={() => handleImageChange(index)}
             >
               <img
-                src={`http://localhost:8000/${image.image_path}`}
+                src={`${baseurl}/${image.image_path}`}
                 alt={`Thumbnail ${index + 1}`}
                 className="w-full h-24 object-cover"
               />
@@ -485,9 +485,9 @@ export default function ProductDetails() {
   useEffect(() => {
     setIsLoading(true);
     Promise.all([
-      axios.get(`http://localhost:8000/api/products/${id}`),
-      axios.get(`http://localhost:8000/api/products/${id}/images`),
-      axios.get(`http://localhost:8000/api/product/${id}/impressions`)
+      axios.get(`${baseurl}/api/products/${id}`),
+      axios.get(`${baseurl}/api/products/${id}/images`),
+      axios.get(`${baseurl}/api/product/${id}/impressions`)
     ])
       .then(([productResponse, imagesResponse, impressionsResponse]) => {
         setProduct(productResponse.data);
@@ -568,7 +568,7 @@ export default function ProductDetails() {
         payment_method: paymentMethod
       };
 
-      await axios.post('http://localhost:8000/api/orders', orderData);
+      await axios.post(`${baseurl}/api/orders`, orderData);
       setOrderSuccess(true);
       showToast('success', 'Order placed successfully!');
       
@@ -590,7 +590,7 @@ export default function ProductDetails() {
   const saveReview = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post("http://localhost:8000/api/submitImpression", {
+      const response = await axios.post(`${baseurl}/api/submitImpression`, {
         clientName,
         clientImpression,
         rating,

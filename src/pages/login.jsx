@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import fortisLogo from './admin/assets/FORTIS-01.svg';
 import backgroundVideo from '../backVideo.mp4'; // Import your video file
-
+const baseurl='http://localhost:8000'
 const AuthForm = () => {
   const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
@@ -31,10 +31,9 @@ const [phone,setphone]=useState(null)
       const endpoint = isLogin ? "login" : "register";
       const payload = isLogin ? { email, password } : { name, email, password ,phone };
 
-      const res = await axios.post(`http://localhost:8000/api/${endpoint}`, payload);
+      const res = await axios.post(`${baseurl}/api/${endpoint}`, payload);
 
       if (res?.data?.token) {
-        sessionStorage.setItem("adminToken", res.data.token);
         if(res.data.user.role==="admin"){
           sessionStorage.setItem("adminToken", res.data.token);
                navigate("/admin/dashboard");
