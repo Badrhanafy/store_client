@@ -18,7 +18,7 @@ const NotificationCenter = ({ API_URL }) => {
   const fetchNotifications = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API_URL}/admin/notifications`, {
+      const response = await axios.get(`http://localhost:8000/api/admin/notifications`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
