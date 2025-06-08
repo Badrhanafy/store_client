@@ -317,7 +317,7 @@ const [phone,setphone]=useState(null)
                 </div>
                 <motion.a 
                   whileHover={{ scale: 1.02 }}
-                  href="#" 
+                  href="/forgot-password" 
                   className="text-sm text-blue-500 hover:text-blue-600 font-medium"
                 >
                   Forgot password?

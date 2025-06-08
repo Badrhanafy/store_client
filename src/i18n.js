@@ -31,6 +31,29 @@ const resources = {
       currency: "DH",
       addToCart: "Add to Cart"
     },
+    reset_password: {
+    "title": "Reset Your Password",
+    "subtitle": "Create a new secure password for your account",
+    "new_password": "New Password",
+    "new_password_placeholder": "Enter your new password",
+    "confirm_password": "Confirm Password",
+    "confirm_password_placeholder": "Re-enter your new password",
+    "password_requirements": "Must be at least 8 characters",
+    "submit_button": "Reset Password",
+    "success_message": "Password reset successfully!",
+    "error_message": "An error occurred, please try again.",
+    "processing": "Processing..."
+  },
+  forgot_password: {
+    "title": "Forgot Password?",
+    "subtitle": "We'll send you a link to reset your password",
+    "email_label": "Email Address",
+    "email_placeholder": "Enter your email address",
+    "submit_button": "Send Reset Link",
+    "success_message": "Password reset link has been sent to your email",
+    "error_message": "An error occurred, please check your email",
+    "processing": "Processing..."
+  },
        contact: {
       title: "Get in Touch",
       subtitle: "We'd love to hear from you! Reach out for collaborations or just a friendly hello 👋",
@@ -179,6 +202,29 @@ const resources = {
       currency: "DH",
       addToCart: "Ajouter au panier"
     },
+    reset_password: {
+    "title": "Réinitialiser votre mot de passe",
+    "subtitle": "Créez un nouveau mot de passe sécurisé pour votre compte",
+    "new_password": "Nouveau mot de passe",
+    "new_password_placeholder": "Entrez votre nouveau mot de passe",
+    "confirm_password": "Confirmer le mot de passe",
+    "confirm_password_placeholder": "Entrez à nouveau votre mot de passe",
+    "password_requirements": "Doit contenir au moins 8 caractères",
+    "submit_button": "Réinitialiser le mot de passe",
+    "success_message": "Mot de passe réinitialisé avec succès !",
+    "error_message": "Une erreur s'est produite, veuillez réessayer.",
+    "processing": "Traitement en cours..."
+  },
+  forgot_password: {
+    "title": "Mot de passe oublié ?",
+    "subtitle": "Nous vous enverrons un lien pour réinitialiser votre mot de passe",
+    "email_label": "Adresse email",
+    "email_placeholder": "Entrez votre adresse email",
+    "submit_button": "Envoyer le lien",
+    "success_message": "Un lien de réinitialisation a été envoyé à votre email",
+    "error_message": "Une erreur s'est produite, veuillez vérifier votre email",
+    "processing": "Traitement en cours..."
+  },
       contact: {
       title: "Contactez-nous",
       subtitle: "Nous serions ravis d'avoir de vos nouvelles ! Contactez-nous pour des collaborations ou juste pour dire bonjour 👋",
@@ -323,6 +369,30 @@ const resources = {
       currency: "درهم",
       addToCart: "أضف إلى السلة"
     },
+    reset_password: {
+    "title": "إعادة تعيين كلمة المرور",
+    "subtitle": "قم بإنشاء كلمة مرور جديدة وآمنة لحسابك",
+    "new_password": "كلمة المرور الجديدة",
+    "new_password_placeholder": "أدخل كلمة المرور الجديدة",
+    "confirm_password": "تأكيد كلمة المرور",
+    "confirm_password_placeholder": "أعد إدخال كلمة المرور الجديدة",
+    "password_requirements": "يجب أن تحتوي على 8 أحرف على الأقل",
+    "submit_button": "إعادة تعيين كلمة المرور",
+    "success_message": "تم إعادة تعيين كلمة المرور بنجاح!",
+    "error_message": "حدث خطأ، يرجى المحاولة مرة أخرى.",
+    "processing": "جاري المعالجة..."
+
+    },
+    forgot_password: {
+    "title": "نسيت كلمة المرور؟",
+    "subtitle": "سنرسل لك رابطًا لإعادة تعيين كلمة المرور الخاصة بك",
+    "email_label": "البريد الإلكتروني",
+    "email_placeholder": "أدخل بريدك الإلكتروني",
+    "submit_button": "إرسال رابط التعيين",
+    "success_message": "تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني",
+    "error_message": "حدث خطأ، يرجى التحقق من بريدك الإلكتروني",
+    "processing": "جاري المعالجة..."
+  },
        contact: {
       title: "اتصل بنا",
       subtitle: "نحن نحب أن نسمع منك! تواصل معنا للتعاون أو فقط لتحية ودية 👋",
@@ -442,7 +512,7 @@ const resources = {
       
     }
   },
-  
+
 };
 
 i18n

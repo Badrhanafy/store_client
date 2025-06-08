@@ -20,13 +20,15 @@ import ProductList from "../pages/products"
 import Products from "../pages/admin/Products"
 import OrdersComponent from "../pages/admin/Orders"
 import SettingsComponent from "../pages/admin/Settings"
-import ForgotResetPassword from "../pages/PwdReset"
+/* import ForgotResetPassword from "../pages/PwdReset" */
 import AdminProtectedRoute from "../pages/admin/AdminProtectedroutes"
 import AdminProfile from "../pages/admin/Profile"
 import AccountComponent from "../pages/account"
 import Account from "../pages/account"
 import UserOrders from "../pages/Userordershistory"
 import Wishlist from "../pages/WishListePage"
+import ResetPassword from "../pages/ResetPassword"
+import ForgotPassword from "../pages/ForgotPassword"
 export const router = createBrowserRouter([
   {
     element : <Layout/>,
@@ -83,10 +85,7 @@ export const router = createBrowserRouter([
         path : '/products/casketat',
         element: <Casketat/>
       },
-       {
-        path : '/PasswoRdreset',
-        element: <ForgotResetPassword/>
-      },
+     
       {
         path : '/account/:id',
         element: <Account/>
@@ -99,6 +98,15 @@ export const router = createBrowserRouter([
         path : '/whishlist',
         element: <Wishlist/>
       },
+      {
+        path : '/reset-password',
+        element: <ResetPassword/>
+      },
+      {
+        path : '/forgot-password',
+        element: <ForgotPassword/>
+      },
+
        
       
      
