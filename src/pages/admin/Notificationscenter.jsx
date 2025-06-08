@@ -43,7 +43,7 @@ const NotificationCenter = ({ API_URL }) => {
 
   const markAsRead = async (id) => {
     try {
-      await axios.patch(`${API_URL}/admin/notifications/${id}/read`, null, {
+      await axios.patch(`http://localhost:8000/api/admin/notifications/${id}/read`, null, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
