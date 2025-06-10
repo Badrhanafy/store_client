@@ -8,12 +8,14 @@ import {
   FiType, FiPlusCircle, FiMoreHorizontal
 } from 'react-icons/fi';
 import axios from 'axios';
+
 import toast, { Toaster } from 'react-hot-toast';
 import NotificationCenter from './Notificationscenter';
 import { motion, AnimatePresence } from 'framer-motion';
 import ProductEditForm from './ProductEdit';
 import OutOfStockProducts from './OutofStock';
 import { useNavigate } from 'react-router-dom';
+import SliderManagement from './SliderManagement';
 // Font classes consistent with your store
 const fontClasses = {
   heading: "font-['Playfair_Display'] font-bold",
@@ -70,6 +72,7 @@ const AdminDashboard = () => {
     sessionStorage.removeItem("adminToken");
     navigate("/login");
   };
+  
   const handleSaveProduct = async (updatedData) => {
     try {
       // Call your API to update the product
@@ -446,7 +449,7 @@ const AdminDashboard = () => {
 
   // Format date for display
   const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
+    if (!dateString) return 'Nor Provided !';
     const options = { year: 'numeric', month: 'short', day: 'numeric' };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
@@ -756,6 +759,8 @@ const AdminDashboard = () => {
                 {t('products')}
               </button>
             </li>
+            {/* // In your sidebar navigation list */}
+           
             <li>
               <button
                 className={`w-full flex items-center p-3 rounded-lg ${activeTab === 'settings' ? 'bg-indigo-700' : 'hover:bg-indigo-700'}`}
@@ -766,6 +771,18 @@ const AdminDashboard = () => {
               >
                 <FiSettings className="mr-3" />
                 {t('storeSettings')}
+              </button>
+            </li>
+             <li>
+              <button
+                className={`w-full flex items-center p-3 rounded-lg ${activeTab === 'slides' ? 'bg-indigo-700' : 'hover:bg-indigo-700'}`}
+                onClick={() => {
+                  setActiveTab('slides');
+                  setMobileSidebarOpen(false);
+                }}
+              >
+                <FiImage className="mr-3" />
+                Carousel Slides
               </button>
             </li>
           </ul>
@@ -820,10 +837,12 @@ const AdminDashboard = () => {
                 <FiMenu size={24} />
               </button>
               <h1 className="text-lg sm:text-xl font-semibold text-gray-800 truncate">
-                {activeTab === 'orders' && <img src={fortisLogo} alt="Logo" style={{  width: "20vh"  }} />}
-                {activeTab === 'dashboard' &&  <img src={fortisLogo} alt="Logo" style={{  width: "20vh"  }} />}
-                {activeTab === 'products' &&<img src={fortisLogo} alt="Logo" style={{  width: "20vh"  }} />}
-                {activeTab === 'settings' && <img src={fortisLogo} alt="Logo" style={{ width: "20vh"  }} />}
+                {activeTab === 'orders' && <img src={fortisLogo} alt="Logo" style={{ width: "20vh" }} />}
+                {activeTab === 'dashboard' && <img src={fortisLogo} alt="Logo" style={{ width: "20vh" }} />}
+                {activeTab === 'products' && <img src={fortisLogo} alt="Logo" style={{ width: "20vh" }} />}
+               
+                {activeTab === 'settings' && <img src={fortisLogo} alt="Logo" style={{ width: "20vh" }} />}
+                 
               </h1>
             </div>
             <div className="flex items-center space-x-2 sm:space-x-4">
@@ -1118,7 +1137,7 @@ const AdminDashboard = () => {
                               </div>
                             </td>
                             <td className="hidden md:table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              {order.phone || 'N/A'}
+                              {order.phone || 'Nor Provided !'}
                             </td>
 
                             <td className="hidden md:table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -1712,9 +1731,9 @@ const AdminDashboard = () => {
                                         <h3 className="text-lg font-medium mb-2">Product Details</h3>
                                         <div className="space-y-2">
                                           <p><span className="font-medium">Description:</span> {product.description}</p>
-                                          <p><span className="font-medium">Colors:</span> {product.colors?.join(', ') || 'N/A'}</p>
-                                          <p><span className="font-medium">Sizes:</span> {product.sizes?.join(', ') || 'N/A'}</p>
-                                          <p><span className="font-medium">Category:</span> {product.category || 'N/A'}</p>
+                                          <p><span className="font-medium">Colors:</span> {product.colors?.join(', ') || 'Nor Provided !'}</p>
+                                          <p><span className="font-medium">Sizes:</span> {product.sizes?.join(', ') || 'Nor Provided !'}</p>
+                                          <p><span className="font-medium">Category:</span> {product.category || 'Nor Provided !'}</p>
                                         </div>
                                       </motion.div>
 
@@ -1839,6 +1858,7 @@ const AdminDashboard = () => {
               )}
             </div>
           )}
+          {activeTab === 'slides' && (<SliderManagement API_URL={API_URL} />)}
         </main>
       </div>
 
@@ -1902,15 +1922,15 @@ const AdminDashboard = () => {
                     </div>
                     <div className="space-y-1">
                       <p className="text-sm text-gray-500">Email</p>
-                      <p className="font-medium text-gray-800">{selectedOrderDetails?.email || 'N/A'}</p>
+                      <p className="font-medium text-gray-800">{selectedOrderDetails?.email || 'Nor Provided !'}</p>
                     </div>
                     <div className="space-y-1">
                       <p className="text-sm text-gray-500">Phone</p>
-                      <p className="font-medium text-gray-800">{selectedOrderDetails?.phone || 'N/A'}</p>
+                      <p className="font-medium text-gray-800">{selectedOrderDetails?.phone || 'Nor Provided !'}</p>
                     </div>
                     <div className="space-y-1">
                       <p className="text-sm text-gray-500">Address</p>
-                      <p className="font-medium text-gray-800">{selectedOrderDetails?.address || 'N/A'}</p>
+                      <p className="font-medium text-gray-800">{selectedOrderDetails?.address || 'Nor Provided !'}</p>
                     </div>
                   </div>
                 </motion.div>
@@ -2083,13 +2103,20 @@ const AdminDashboard = () => {
                   <div>
                     <h2 className="text-2xl font-bold text-gray-800">{t('invoice')}</h2>
                     <p className="text-gray-600">{t('order')} # {selectedOrder.id}</p>
-                    <img
-                      src="FORTIS-01.png"
-                      alt="Fortis Logo"
-                      style={{ border: "4px solid" }}
-                      className="h-26 md:h-22 w-auto max-w-[220px] md:max-w-[280px] object-contain transform hover:scale-105 transition-transform duration-200"
-                    />
+
+                    <div className="flex justify-center items-center text-center">
+                      <img
+                        src="/FORTIS-01.svg"
+                        alt="Fortis Logo"
+                        style={{
+                          position: 'relative', left: '50vh',
+
+                        }}
+                        className=" invoice-logo border-4 h-22 md:h-18 w-auto max-w-[220px] md:max-w-[280px] object-contain transform hover:scale-105 transition-transform duration-200"
+                      />
+                    </div>
                   </div>
+
                   <div className="text-right">
                     <p className="text-gray-600">{t('date')}: {formatDate(selectedOrder.created_at)}</p>
                     <p className="text-gray-600">{t('status')}: <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
@@ -2112,15 +2139,15 @@ const AdminDashboard = () => {
                     </div>
                     <div>
                       <p className="font-medium text-gray-700">{t('phone')}:</p>
-                      <p>{selectedOrder.phone || 'N/A'}</p>
+                      <p>{selectedOrder.phone || 'Nor Provided !'}</p>
                     </div>
                     <div>
                       <p className="font-medium text-gray-700">{t('email')}:</p>
-                      <p>{selectedOrder.email || 'N/A'}</p>
+                      <p className={`${selectedOrder.email}? text-black : text-red-400`}>{selectedOrder.email || 'Nor Provided !'}</p>
                     </div>
                     <div>
                       <p className="font-medium text-gray-700">{t('address')}:</p>
-                      <p>{selectedOrder.address || 'N/A'}</p>
+                      <p>{selectedOrder.address || 'Nor Provided !'}</p>
                     </div>
                   </div>
                 </div>
