@@ -29,6 +29,7 @@ import UserOrders from "../pages/Userordershistory"
 import Wishlist from "../pages/WishListePage"
 import ResetPassword from "../pages/ResetPassword"
 import ForgotPassword from "../pages/ForgotPassword"
+import NewArrivals from "../pages/products/NewArrivals"
 export const router = createBrowserRouter([
   {
     element : <Layout/>,
@@ -105,6 +106,10 @@ export const router = createBrowserRouter([
       {
         path : '/forgot-password',
         element: <ForgotPassword/>
+      },
+        {
+        path : '/products/new-arrivals',
+        element: <NewArrivals/>
       },
 
        

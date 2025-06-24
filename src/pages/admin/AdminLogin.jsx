@@ -13,7 +13,7 @@ function AdminLogin() {
     setError('');
 
     try {
-      const res = await axios.post('http://localhost:8000/api/admin/login', {
+      const res = await axios.post('http://192.168.1.13:8000/api/admin/login', {
         email,
         password,
       });

@@ -44,7 +44,7 @@ const OrdersComponent = ({
     const currentLanguage = i18n?.language || 'en';
 
     // API base URL
-    const API_URL = process.env.REACT_APP_API_URL || 'http://192.168.187.1:8000/api';
+    const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
 
     // Safe number formatting function
     const formatPrice = (price) => {

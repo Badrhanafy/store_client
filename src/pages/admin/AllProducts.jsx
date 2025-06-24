@@ -8,7 +8,7 @@ function AllProducts() {
 
   useEffect(() => {
     // Fetch all products
-    axios.get("http://192.168.187.1:8000/api/products")
+    axios.get("http://localhost:8000/api/products")
       .then(res => setProducts(res.data))
       .catch(err => console.error(err));
   }, []);
@@ -22,7 +22,7 @@ function AllProducts() {
           <div key={product.id} className="border rounded-lg p-4 shadow-sm bg-white">
             {/* Product Image */}
             <img 
-              src={`http://192.168.187.1:8000/${product.image}`} 
+              src={`http://localhost:8000/${product.image}`} 
               alt={product.name}
               className="w-full h-40 object-cover rounded mb-4"
             />

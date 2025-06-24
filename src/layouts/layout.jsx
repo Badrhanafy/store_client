@@ -7,6 +7,10 @@ import { useContext } from 'react';
 import { WishlistContext } from '../context/Wishlistecontext';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from "axios";
+
+import Lottie from "lottie-react";
+import NotFound from '../pages/Notfound.json';
+
 import { useTranslation } from 'react-i18next';
 import fortisLogo from '../pages/admin/assets/FORTIS-01.svg';
 
@@ -273,7 +277,7 @@ export default function Layout() {
                   {!token && (
                     <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50 border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
                       <div className="px-4 py-2 text-sm text-gray-700">
-                        Please login to access your account and order history
+                        {t('contact.sign')}
                       </div>
                       <div className="border-t border-gray-100 py-1">
                         <NavLink
@@ -397,6 +401,13 @@ export default function Layout() {
                       className="mt-8 text-center"
                     >
                       <p className="text-white text-lg">No products found matching "{searchQuery}"</p>
+                      <div width='20vh' style={{
+                        width:"60vh",
+                        marginTop:"-11vh",
+                        marginLeft:"34vh"
+                      }}> 
+                                  <Lottie animationData={NotFound} loop={true} />
+                      </div>
                     </motion.div>
                   )}
                 </div>

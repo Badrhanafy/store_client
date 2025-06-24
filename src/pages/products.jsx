@@ -7,6 +7,7 @@ import { useCart } from './CartContext';
 import { t } from 'i18next';
 import { WishlistContext } from '../context/Wishlistecontext';
 import { useContext } from 'react';
+
 // Font classes (consistent with homepage)
 const fontClasses = {
   heading: "font-['Playfair_Display'] font-bold",
@@ -16,6 +17,7 @@ const fontClasses = {
 };
 
 const baseurl = 'http://localhost:8000'
+
 // Notification Component
 const Notification = ({ message, onClose }) => (
   <motion.div
@@ -76,14 +78,14 @@ const ProductCard = ({ product, onAddToCart, hoveredProduct, setHoveredProduct }
       onMouseEnter={() => setHoveredProduct(product.id)}
       onMouseLeave={() => setHoveredProduct(null)}
     >
-      <div className="relative overflow-hidden h-64">
+      <div className="relative overflow-hidden h-48 sm:h-64">
         <img
           src={`${baseurl}/${product.image}`}
           alt={product.title}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
 
-        <div className={`absolute top-4 right-4 flex flex-col  space-y-2 transition-all duration-300 ${hoveredProduct === product.id ? 'opacity-100' : 'opacity-0'}`} >
+        <div className={`absolute top-4 right-4 flex flex-col space-y-2 transition-all duration-300 ${hoveredProduct === product.id ? 'opacity-100' : 'opacity-0'}`} >
           <button
             onClick={handleWishlist}
             className="absolute top-2 right-2 p-2 bg-white/80 rounded-full mt-8 ml-16"
@@ -107,33 +109,33 @@ const ProductCard = ({ product, onAddToCart, hoveredProduct, setHoveredProduct }
         )}
       </div>
 
-      <div className="p-6">
+      <div className="p-4 sm:p-6">
         <div className="flex justify-between items-start">
           <div>
-            <h3 className={`${fontClasses.subheading} text-lg text-gray-800 group-hover:text-indigo-600 transition-colors`}>
+            <h3 className={`${fontClasses.subheading} text-sm sm:text-lg text-gray-800 group-hover:text-indigo-600 transition-colors`}>
               {product.title}
             </h3>
-            <p className={`${fontClasses.body} text-gray-500 text-sm mt-1 line-clamp-2`}>
+            <p className={`${fontClasses.body} text-gray-500 text-xs sm:text-sm mt-1 line-clamp-2`}>
               {product.description || 'No description available'}
             </p>
           </div>
           <div className="flex items-center">
             <FiStar className="text-yellow-400 fill-current" />
-            <span className={`${fontClasses.body} text-gray-600 ml-1`}>{product.rating || '4.5'}</span>
+            <span className={`${fontClasses.body} text-gray-600 ml-1 text-xs sm:text-base`}>{product.rating || '4.5'}</span>
           </div>
         </div>
 
-        <div className="mt-4 flex justify-between items-center">
+        <div className="mt-3 sm:mt-4 flex justify-between items-center">
           <div>
-            <span className={`${fontClasses.heading} text-xl text-gray-900`}>{product.price} DH</span>
+            <span className={`${fontClasses.heading} text-sm sm:text-xl text-gray-900`}>{product.price} DH</span>
             {product.originalPrice && (
-              <span className={`${fontClasses.body} text-gray-400 line-through ml-2`}>{product.originalPrice} DH</span>
+              <span className={`${fontClasses.body} text-gray-400 line-through ml-2 text-xs sm:text-base`}>{product.originalPrice} DH</span>
             )}
           </div>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className={`${fontClasses.body} bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-full text-sm transition-colors duration-300`}
+            className={`${fontClasses.body} bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm transition-colors duration-300`}
           >
             <Link to={`product/${product.id}`}>Show More</Link>
           </motion.button>
@@ -141,11 +143,11 @@ const ProductCard = ({ product, onAddToCart, hoveredProduct, setHoveredProduct }
       </div>
 
       {product.colors && (
-        <div className="px-6 pb-6 flex space-x-2">
+        <div className="px-4 sm:px-6 pb-4 sm:pb-6 flex space-x-2">
           {product.colors.map((color, index) => (
             <div
               key={index}
-              className="w-5 h-5 rounded-full border border-gray-200"
+              className="w-4 h-4 sm:w-5 sm:h-5 rounded-full border border-gray-200"
               style={{ backgroundColor: color }}
               title={color}
             />
@@ -215,7 +217,7 @@ export default function ProductList() {
   }
 
   return (
-    <div className="bg-gray-50 py-16 relative">
+    <div className="bg-gray-50 py-8 sm:py-16 relative">
       <AnimatePresence>
         {notification && (
           <Notification
@@ -225,19 +227,19 @@ export default function ProductList() {
         )}
       </AnimatePresence>
 
-      <div className="container mx-auto px-6">
-        <div className="flex flex-col md:flex-row justify-between items-center mb-12">
+      <div className="container mx-auto px-4 sm:px-6">
+        <div className="flex flex-col md:flex-row justify-between items-center mb-8 sm:mb-12">
           <div>
-            <h2 className={`${fontClasses.heading} text-3xl md:text-4xl text-gray-800`}>{t("Our Collection")}</h2>
-            <p className={`${fontClasses.body} text-gray-600 mt-2`}>{t("Discover pieces that tell your story")}</p>
+            <h2 className={`${fontClasses.heading} text-2xl sm:text-3xl md:text-4xl text-gray-800`}>{t("Our Collection")}</h2>
+            <p className={`${fontClasses.body} text-gray-600 mt-1 sm:mt-2 text-sm sm:text-base`}>{t("Discover pieces that tell your story")}</p>
           </div>
-          <div className="mt-4 md:mt-0 flex items-center">
-            <span className={`${fontClasses.subheading} text-gray-600 mr-2`}>View all</span>
+          <div className="mt-3 sm:mt-0 flex items-center">
+            <span className={`${fontClasses.subheading} text-gray-600 mr-2 text-sm sm:text-base`}>View all</span>
             <FiChevronRight className="text-gray-600" />
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
           {products.map((product) => (
             <ProductCard
               key={product.id}
@@ -249,8 +251,8 @@ export default function ProductList() {
           ))}
         </div>
 
-        <div className="mt-16 text-center">
-          <button className={`${fontClasses.body} border-2 border-indigo-600 text-indigo-600 hover:bg-indigo-600 hover:text-white px-8 py-3 rounded-full transition-colors duration-300 flex items-center mx-auto`}>
+        <div className="mt-8 sm:mt-16 text-center">
+          <button className={`${fontClasses.body} border-2 border-indigo-600 text-indigo-600 hover:bg-indigo-600 hover:text-white px-6 py-2 sm:px-8 sm:py-3 rounded-full transition-colors duration-300 flex items-center mx-auto text-sm sm:text-base`}>
             Load More
             <FiChevronRight className="ml-2" />
           </button>

@@ -33,7 +33,7 @@ export default function AddProduct() {
  useEffect(() => {
     const getCsrfToken = async () => {
       try {
-        await axios.get('http://localhost:8000/sanctum/csrf-cookie');
+        await axios.get('http://192.168.1.13:8000/sanctum/csrf-cookie');
       } catch (error) {
         console.error('Error fetching CSRF token:', error);
       }
@@ -109,7 +109,7 @@ const handleSubmit = async (e) => {
   formDataToSend.append('colors', JSON.stringify(formData.colors));
 
   try {
-    const res = await axios.post('http://localhost:8000/api/products', formDataToSend, {
+    const res = await axios.post('http://192.168.1.13:8000/api/products', formDataToSend, {
       headers: {
         'Content-Type': 'multipart/form-data',
         'Accept': 'application/json',
