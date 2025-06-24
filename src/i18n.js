@@ -76,6 +76,12 @@ const resources = {
       sign : "Please login to access your account and order history"
     },
      home: {
+      "viewDetails":"viewDetails",
+     "freeDelivery": {
+      "title": "Free Delivery in Laayoune!",
+      "description": "Enjoy free delivery on all orders within Laayoune city. No minimum purchase required!",
+      "badge": "Free"
+    },
       slides: [
         {
           title: "Summer Collection 2023",
@@ -249,6 +255,12 @@ const resources = {
       sign : "Veuillez vous connecter pour accéder à votre compte et à l’historique de vos commandes."
     },
     home: {
+      "viewDetails":"Detailles",
+    "freeDelivery": {
+      "title": "Livraison gratuite à Laâyoune !",
+      "description": "Profitez de la livraison gratuite pour toutes les commandes dans la ville de Laâyoune. Aucun minimum d'achat requis !",
+      "badge": "Gratuit"
+    },
       slides: [
         {
           title: "Collection d'été 2023",
@@ -420,6 +432,12 @@ const resources = {
             sign : "يرجى تسجيل الدخول للوصول إلى حسابك وتاريخ الطلبات."
     },
      home: {
+      "viewDetails":"رؤية التفاصيل",
+      "freeDelivery": {
+      "title": "توصيل مجاني في العيون!",
+      "description": "استمتع بتوصيل مجاني لجميع الطلبات داخل مدينة العيون. لا يوجد حد أدنى للشراء!",
+      "badge": "مجاني"
+    },
       slides: [
         {
           title: "مجموعة الصيف 2023",

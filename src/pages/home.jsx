@@ -9,6 +9,32 @@ import axios from 'axios';
 
 // Constants
 const API_ENDPOINT = 'http://localhost:8000/api';
+const isArabic = document.documentElement.lang === 'ar';
+// Static categories configuration
+const STATIC_CATEGORIES = [
+  {
+    id: 1,
+    name: "9obiyat",
+    image: "/clothes/90biya.jpg",
+    link: "/products/9obiyat",
+    label: "9obiyat"
+  },
+  {
+    id: 2,
+    name: "chapeau",
+    image: "/clothes/caskette.jpeg",
+    link: "/products?category=chapeau",
+    label: "Casketat"
+  },
+  {
+    id: 3,
+    name: "accessories",
+    image: "/clothes/accessories.jpg",
+    link: "/products?category=accessories",
+    label: "Accessories"
+  }
+  // Add more categories as needed
+];
 
 // Star Rating Component
 const StarRating = ({ rating }) => {
@@ -21,7 +47,7 @@ const StarRating = ({ rating }) => {
       {[...Array(fullStars)].map((_, i) => (
         <svg
           key={`full-${i}`}
-          className="w-5 h-5 text-amber-400"
+          className="w-5 h-5 text-amber-400 "
           fill="currentColor"
           viewBox="0 0 20 20"
         >
@@ -60,7 +86,7 @@ const StarRating = ({ rating }) => {
         </svg>
       ))}
       
-      <span className="ml-2 text-sm text-gray-600">
+      <span className="ml-2 text-sm text-yellow-400 font-bold">
         ({rating})
       </span>
     </div>
@@ -81,11 +107,10 @@ const HomePage = () => {
   const [slides, setSlides] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [categories, setCategories] = useState([]);
   const [topRatedProducts, setTopRatedProducts] = useState([]);
   const sliderRef = useRef(null);
 
-  // Fetch all dynamic content
+  // Fetch all dynamic content except categories
   useEffect(() => {
     const fetchContent = async () => {
       try {
@@ -99,22 +124,8 @@ const HomePage = () => {
 
         setSlides(slidesRes.data);
         
-        // Extract unique categories from products
-        const products = productsRes.data;
-        const uniqueCategories = [...new Set(products.map(p => p.category))]
-          .filter(c => c)
-          .map((category, index) => ({
-            id: index + 1,
-            name: category,
-            image: products.find(p => p.category === category)?.images?.[0] || '/placeholder-category.jpg',
-            link: `/products?category=${encodeURIComponent(category)}`,
-            label: category
-          }));
-        
-        setCategories(uniqueCategories);
-        
         // Get top rated products
-        const topRated = [...products]
+        const topRated = [...productsRes.data]
           .sort((a, b) => (b.rating || 0) - (a.rating || 0))
           .slice(0, 8);
           
@@ -144,23 +155,6 @@ const HomePage = () => {
 
   // Fallback content if API fails
   const loadFallbackContent = () => {
-    setCategories([
-      {
-        id: 1,
-        name: "9obiyat",
-        image: "clothes/90biya.jpg",
-        link: "/products?category=9obiyat",
-        label: t('home.categories.9obiyat')
-      },
-      {
-        id: 2,
-        name: "chapeau",
-        image: "clothes/caskette.jpeg",
-        link: "/products?category=chapeau",
-        label: t('home.categories.casketat')
-      }
-    ]);
-    
     setTopRatedProducts([
       {
         id: 1,
@@ -229,9 +223,7 @@ const HomePage = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Carousel */}
-      <div className="absolute top-0 left-0 w-64 z-0">
-        <Lottie animationData={animationData} loop={true} />
-      </div>
+      
       <CarouselSection
         slides={slides}
         currentSlide={currentSlide}
@@ -248,18 +240,23 @@ const HomePage = () => {
         t={t}
       />
 
-      {/* Featured Categories */}
+      {/* Featured Categories - Now using STATIC_CATEGORIES */}
       <CategoriesSection
-        categories={categories}
+        categories={STATIC_CATEGORIES}
         fontClasses={fontClasses}
         t={t}
       />
 
-      {/* Newsletter */}
+       {/* Newsletter */}
       <NewsletterSection
         fontClasses={fontClasses}
         t={t}
       />
+<FreeDeliverySection
+        fontClasses={fontClasses}
+        t={t}
+      />
+     
 
       {/* Footer */}
       <FooterSection
@@ -270,8 +267,7 @@ const HomePage = () => {
   );
 };
 
-// Componentized sections
-
+// Componentized sections (remain the same as in your original code)
 const CarouselSection = ({ slides, currentSlide, setCurrentSlide, fontClasses, t }) => (
   <section className="relative h-screen pt-16 overflow-hidden">
     {slides.length > 0 ? (
@@ -362,7 +358,7 @@ const TopRatedProductsSection = ({ products, sliderRef, fontClasses, t }) => {
         <div className="absolute bottom-0 right-0 w-64 h-64 bg-amber-100 rounded-full opacity-10 blur-3xl"></div>
       </div>
 
-      <div className="container mx-auto px-6 relative">
+      <div className="container mx-auto px-4 sm:px-6 relative">
         <div className="flex justify-between items-center mb-12">
           <div>
             <h2 className={`${fontClasses.heading} text-3xl md:text-4xl mb-2`}>
@@ -380,10 +376,10 @@ const TopRatedProductsSection = ({ products, sliderRef, fontClasses, t }) => {
         </div>
 
         <div className="relative">
-          {/* Navigation Arrows - Positioned in the padding area */}
+          {/* Navigation Arrows - Show only on larger screens */}
           <button 
             onClick={prevSlide}
-            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-16 z-20 w-14 h-14 flex items-center justify-center bg-white rounded-full shadow-xl hover:bg-gray-50 transition-all duration-300 hover:scale-110 focus:outline-none"
+            className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-16 z-20 w-14 h-14 items-center justify-center bg-white rounded-full shadow-xl hover:bg-gray-50 transition-all duration-300 hover:scale-110 focus:outline-none"
             aria-label={t('home.previousProducts')}
           >
             <FiChevronLeft className="text-gray-700 text-2xl" />
@@ -391,19 +387,19 @@ const TopRatedProductsSection = ({ products, sliderRef, fontClasses, t }) => {
           
           <button 
             onClick={nextSlide}
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-16 z-20 w-14 h-14 flex items-center justify-center bg-white rounded-full shadow-xl hover:bg-gray-50 transition-all duration-300 hover:scale-110 focus:outline-none"
+            className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-16 z-20 w-14 h-14 items-center justify-center bg-white rounded-full shadow-xl hover:bg-gray-50 transition-all duration-300 hover:scale-110 focus:outline-none"
             aria-label={t('home.nextProducts')}
           >
             <FiChevronRight className="text-gray-700 text-2xl" />
           </button>
 
-          {/* Products Container */}
+          {/* Products Container - Updated grid classes */}
           <div 
             ref={sliderRef}
-            className="relative overflow-visible mx-4"
+            className="relative overflow-visible"
           >
             <motion.div
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"
+              className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6"
               key={currentIndex}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -426,38 +422,38 @@ const TopRatedProductsSection = ({ products, sliderRef, fontClasses, t }) => {
                       loading="lazy"
                     />
                     {product.discount && (
-                      <div className="absolute top-4 right-4 bg-gradient-to-r from-red-500 to-amber-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
+                      <div className="absolute top-2 right-2 bg-gradient-to-r from-red-500 to-amber-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-md">
                         -{product.discount}%
                       </div>
                     )}
 
                     {/* Rating Stars */}
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3">
                       <StarRating rating={product.impressions_avg_rating || 0} />
                     </div>
                   </div>
 
-                  <div className="p-6">
-                    <h3 className={`${fontClasses.subheading} text-lg mb-1 truncate`}>
+                  <div className="p-4">
+                    <h3 className={`${fontClasses.subheading} text-sm sm:text-base mb-1 truncate`}>
                       {product.name}
                     </h3>
-                    <p className={`${fontClasses.body} text-gray-500 text-sm mb-3`}>
+                    <p className={`${fontClasses.body} text-gray-500 text-xs sm:text-sm mb-2`}>
                       {product.category || t('home.featuredProduct')}
                     </p>
                     <div className="flex items-center justify-between">
                       <div>
-                        <span className={`${fontClasses.heading} text-xl text-gray-900`}>
+                        <span className={`${fontClasses.heading} text-sm sm:text-base text-gray-900`}>
                           ${product.price || '0.00'}
                         </span>
                         {product.originalPrice && (
-                          <span className={`${fontClasses.body} ml-2 text-gray-400 text-sm line-through`}>
+                          <span className={`${fontClasses.body} ml-1 text-gray-400 text-xs line-through`}>
                             ${product.originalPrice}
                           </span>
                         )}
                       </div>
                       <Link
                         to={`/AllProducts/product/${product.id}`}
-                        className={`${fontClasses.subheading} bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-full text-sm transition-colors`}
+                        className={`${fontClasses.subheading} bg-indigo-600 hover:bg-indigo-700 text-white px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm transition-colors`}
                       >
                         {t('home.viewDetails')}
                       </Link>
@@ -469,13 +465,14 @@ const TopRatedProductsSection = ({ products, sliderRef, fontClasses, t }) => {
           </div>
         </div>
 
+        {/* Mobile pagination dots - Show only on small screens */}
         {totalPages > 1 && (
-          <div className="flex justify-center mt-12 space-x-2">
+          <div className="md:hidden flex justify-center mt-8 space-x-2">
             {Array.from({ length: totalPages }).map((_, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentIndex(index)}
-                className={`w-3 h-3 rounded-full transition-all ${currentIndex === index ? 'bg-indigo-600 w-8' : 'bg-gray-300'}`}
+                className={`w-2 h-2 rounded-full transition-all ${currentIndex === index ? 'bg-indigo-600 w-4' : 'bg-gray-300'}`}
                 aria-label={`${t('home.goToPage')} ${index + 1}`}
               />
             ))}
@@ -561,11 +558,126 @@ const NewsletterSection = ({ fontClasses, t }) => (
         </div>
       </div>
     </div>
+    
   </section>
 );
+// Add this new component before the NewsletterSection in your HomePage component
+const FreeDeliverySection = ({ fontClasses, t }) => {
+  const { i18n } = useTranslation();
+  const isRTL = i18n.language === 'ar';
+  
+  // Text animation variants
+  const textVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.8,
+        ease: "easeOut",
+        staggerChildren: 0.15,
+        delayChildren: 0.3
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.6, ease: "easeOut" }
+    }
+  };
+
+  return (
+    <section className="py-20 relative overflow-hidden h-[500px] md:h-[600px]">
+      {/* Background image with dark gradient fade */}
+      <div className="absolute inset-0">
+        <img 
+          src="/laayoune.jpg" 
+          alt="Laayoune city" 
+          className="w-full h-full object-cover"
+        />
+        {/* Dynamic gradient overlay based on language direction */}
+        <div 
+          className={`absolute inset-0 ${
+            isRTL 
+              ? 'bg-gradient-to-l from-black/80 via-black/50 to-transparent' 
+              : 'bg-gradient-to-r from-black/80 via-black/50 to-transparent'
+          }`} 
+        />
+      </div>
+
+      {/* Content container */}
+      <div className={`container mx-auto px-6 relative z-10 h-full flex items-center ${
+        isRTL ? 'text-right' : 'text-left'
+      }`}>
+        <motion.div
+          className="max-w-2xl"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          variants={textVariants}
+        >
+          <motion.h2 
+            className={`${fontClasses.heading} text-3xl md:text-4xl mb-4 text-yellow-200`}
+            variants={itemVariants}
+          >
+            {t("home.freeDelivery.title")}
+          </motion.h2>
+          <motion.p 
+            className={`${fontClasses.body} text-gray-200 mb-6`}
+            variants={itemVariants}
+          >
+            {t("home.freeDelivery.description")}
+          </motion.p>
+          <motion.div 
+            className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}
+            variants={itemVariants}
+          >
+            <motion.span 
+              className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-2 rounded-full text-sm font-medium mr-3 shadow-lg"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 400 }}
+            >
+              {t("home.freeDelivery.badge")}
+            </motion.span>
+            <motion.span 
+              className={`${fontClasses.subheading} text-white`}
+              whileHover={{ x: isRTL ? -5 : 5 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
+              Laayoune City
+            </motion.span>
+          </motion.div>
+        </motion.div>
+
+        {/* Lottie Animation - Position based on language */}
+        <motion.div 
+          className={`absolute ${isRTL ? 'left-10' : 'right-10'} bottom-10 w-48 md:w-64`}
+          initial={{ opacity: 0, scale: 0.8 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
+        >
+          <Lottie 
+            animationData={animationData} 
+            loop={true}
+          />
+        </motion.div>
+      </div>
+    </section>
+  );
+};
+
 
 const FooterSection = ({ fontClasses, t }) => (
   <footer className="bg-gray-900 text-white pt-20 pb-12">
+    <div className="absolute top-0 left-0 w-64 z-0">
+        <Lottie animationData={animationData} loop={true} />
+      </div>
     <div className="container mx-auto px-6">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
         <div>
