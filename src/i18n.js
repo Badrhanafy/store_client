@@ -29,7 +29,8 @@ const resources = {
       emptyMessage: "We couldn't find any items in this collection",
       noDescription: "No description available",
       currency: "DH",
-      addToCart: "Add to Cart"
+      addToCart: "Add to Cart",
+      
     },
     reset_password: {
     "title": "Reset Your Password",
@@ -71,9 +72,16 @@ const resources = {
       emailPlaceholder: "Enter your email address",
       messageLabel: "Your Message",
       messagePlaceholder: "How can we help you?",
-      submitButton: "Send Message"
+      submitButton: "Send Message",
+      sign : "Please login to access your account and order history"
     },
      home: {
+      "viewDetails":"viewDetails",
+     "freeDelivery": {
+      "title": "Free Delivery in Laayoune!",
+      "description": "Enjoy free delivery on all orders within Laayoune city. No minimum purchase required!",
+      "badge": "Free"
+    },
       slides: [
         {
           title: "Summer Collection 2023",
@@ -200,7 +208,8 @@ const resources = {
       emptyMessage: "Nous n'avons trouvé aucun article dans cette collection",
       noDescription: "Aucune description disponible",
       currency: "DH",
-      addToCart: "Ajouter au panier"
+      addToCart: "Ajouter au panier",
+      
     },
     reset_password: {
     "title": "Réinitialiser votre mot de passe",
@@ -242,9 +251,16 @@ const resources = {
       emailPlaceholder: "Entrez votre adresse email",
       messageLabel: "Votre message",
       messagePlaceholder: "Comment pouvons-nous vous aider?",
-      submitButton: "Envoyer le message"
+      submitButton: "Envoyer le message",
+      sign : "Veuillez vous connecter pour accéder à votre compte et à l’historique de vos commandes."
     },
     home: {
+      "viewDetails":"Detailles",
+    "freeDelivery": {
+      "title": "Livraison gratuite à Laâyoune !",
+      "description": "Profitez de la livraison gratuite pour toutes les commandes dans la ville de Laâyoune. Aucun minimum d'achat requis !",
+      "badge": "Gratuit"
+    },
       slides: [
         {
           title: "Collection d'été 2023",
@@ -367,7 +383,8 @@ const resources = {
       emptyMessage: "لم نتمكن من العثور على أي عناصر في هذه المجموعة",
       noDescription: "لا يوجد وصف متاح",
       currency: "درهم",
-      addToCart: "أضف إلى السلة"
+      addToCart: "أضف إلى السلة",
+      sign : "يرجى تسجيل الدخول للوصول إلى حسابك وتاريخ الطلبات."
     },
     reset_password: {
     "title": "إعادة تعيين كلمة المرور",
@@ -394,6 +411,7 @@ const resources = {
     "processing": "جاري المعالجة..."
   },
        contact: {
+
       title: "اتصل بنا",
       subtitle: "نحن نحب أن نسمع منك! تواصل معنا للتعاون أو فقط لتحية ودية 👋",
       emailTitle: "راسلنا عبر البريد",
@@ -410,9 +428,16 @@ const resources = {
       emailPlaceholder: "أدخل عنوان بريدك الإلكتروني",
       messageLabel: "رسالتك",
       messagePlaceholder: "كيف يمكننا مساعدتك؟",
-      submitButton: "إرسال الرسالة"
+      submitButton: "إرسال الرسالة",
+            sign : "يرجى تسجيل الدخول للوصول إلى حسابك وتاريخ الطلبات."
     },
      home: {
+      "viewDetails":"رؤية التفاصيل",
+      "freeDelivery": {
+      "title": "توصيل مجاني في العيون!",
+      "description": "استمتع بتوصيل مجاني لجميع الطلبات داخل مدينة العيون. لا يوجد حد أدنى للشراء!",
+      "badge": "مجاني"
+    },
       slides: [
         {
           title: "مجموعة الصيف 2023",

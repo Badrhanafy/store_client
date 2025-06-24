@@ -24,7 +24,7 @@ function AddProductImages({ productId }) {
 
     try {
       await axios.post(
-        `http://192.168.187.1:8000/api/admin/products/${productId}/add-images`,
+        `http://localhost:8000/api/admin/products/${productId}/add-images`,
         formData,
         {
           headers: {

@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { 
-  FiShoppingCart, FiTrash2, FiPlus, FiMinus, FiX, 
-  FiSend, FiAlertCircle, FiMapPin, FiShoppingBag, 
-  FiPhone, FiMail, FiCheckCircle, FiInfo, FiUser 
+import {
+  FiShoppingCart, FiTrash2, FiPlus, FiMinus, FiX,
+  FiSend, FiAlertCircle, FiMapPin, FiShoppingBag,
+  FiPhone, FiMail, FiCheckCircle, FiInfo, FiUser
 } from 'react-icons/fi';
 import { useCart } from './CartContext';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-
+import Lottie from "lottie-react";
+import animationData from './Animation - 1749846553631.json';
 const Cart = () => {
-  const { 
+  const {
     cartCount,
     getCartItems,
     removeFromCart,
@@ -43,7 +44,7 @@ const Cart = () => {
   const handleUpdateQuantity = (id, newQuantity) => {
     if (newQuantity < 1) return;
     updateQuantity(id, newQuantity);
-    setLocalItems(prev => 
+    setLocalItems(prev =>
       prev.map(item => item.id === id ? { ...item, quantity: newQuantity } : item)
     );
   };
@@ -73,7 +74,7 @@ const Cart = () => {
     if (!customerInfo.address.trim()) {
       errors.address = 'Address is required';
     }
-    
+
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -84,7 +85,7 @@ const Cart = () => {
       ...prev,
       [name]: value
     }));
-    
+
     if (formErrors[name]) {
       setFormErrors(prev => ({ ...prev, [name]: '' }));
     }
@@ -135,7 +136,7 @@ const Cart = () => {
     } catch (error) {
       console.error(error);
       showNotification(
-        error.response?.data?.message || 'Failed to place order', 
+        error.response?.data?.message || 'Failed to place order',
         'error'
       );
     } finally {
@@ -149,13 +150,13 @@ const Cart = () => {
       error: 'bg-red-50 border-red-400',
       info: 'bg-blue-50 border-blue-400'
     };
-    
+
     const textColor = {
       success: 'text-green-800',
       error: 'text-red-800',
       info: 'text-blue-800'
     };
-    
+
     const icon = {
       success: <FiCheckCircle className="h-5 w-5 text-green-500" />,
       error: <FiAlertCircle className="h-5 w-5 text-red-500" />,
@@ -198,17 +199,17 @@ const Cart = () => {
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <AnimatePresence>
         {notification && (
-          <Notification 
-            message={notification.message} 
-            type={notification.type} 
-            onClose={() => setNotification(null)} 
+          <Notification
+            message={notification.message}
+            type={notification.type}
+            onClose={() => setNotification(null)}
           />
         )}
       </AnimatePresence>
 
       {showOrderModal && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
@@ -224,14 +225,14 @@ const Cart = () => {
                     Complete Order
                   </h2>
                 </div>
-                <button 
+                <button
                   onClick={() => setShowOrderModal(false)}
                   className="p-1 rounded-full hover:bg-gray-100 text-gray-500 hover:text-gray-700"
                 >
                   <FiX size={24} />
                 </button>
               </div>
-              
+
               <div className="space-y-4">
                 <div className="relative">
                   <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
@@ -242,14 +243,13 @@ const Cart = () => {
                     name="customer_name"
                     value={customerInfo.customer_name}
                     onChange={handleInputChange}
-                    className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none ${
-                      formErrors.customer_name ? 'border-red-500' : 'border-gray-300'
-                    }`}
+                    className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none ${formErrors.customer_name ? 'border-red-500' : 'border-gray-300'
+                      }`}
                     placeholder="Your name"
                   />
                   {formErrors.customer_name && <ErrorMessage message={formErrors.customer_name} />}
                 </div>
-                
+
                 <div className="relative">
                   <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
                     <FiPhone />
@@ -259,14 +259,13 @@ const Cart = () => {
                     name="phone"
                     value={customerInfo.phone}
                     onChange={handleInputChange}
-                    className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none ${
-                      formErrors.phone ? 'border-red-500' : 'border-gray-300'
-                    }`}
+                    className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none ${formErrors.phone ? 'border-red-500' : 'border-gray-300'
+                      }`}
                     placeholder="Phone number"
                   />
                   {formErrors.phone && <ErrorMessage message={formErrors.phone} />}
                 </div>
-                
+
                 <div className="relative">
                   <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
                     <FiMail />
@@ -276,14 +275,13 @@ const Cart = () => {
                     name="email"
                     value={customerInfo.email}
                     onChange={handleInputChange}
-                    className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none ${
-                      formErrors.email ? 'border-red-500' : 'border-gray-300'
-                    }`}
+                    className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none ${formErrors.email ? 'border-red-500' : 'border-gray-300'
+                      }`}
                     placeholder="Email address"
                   />
                   {formErrors.email && <ErrorMessage message={formErrors.email} />}
                 </div>
-                
+
                 <div className="relative">
                   <div className="absolute left-3 top-4 text-gray-400">
                     <FiMapPin />
@@ -293,21 +291,19 @@ const Cart = () => {
                     value={customerInfo.address}
                     onChange={handleInputChange}
                     rows={3}
-                    className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none ${
-                      formErrors.address ? 'border-red-500' : 'border-gray-300'
-                    }`}
+                    className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none ${formErrors.address ? 'border-red-500' : 'border-gray-300'
+                      }`}
                     placeholder="Delivery address"
                   />
                   {formErrors.address && <ErrorMessage message={formErrors.address} />}
                 </div>
-                
+
                 <div className="pt-2">
                   <button
                     onClick={submitOrder}
                     disabled={isSubmitting}
-                    className={`w-full py-3 px-4 rounded-lg text-white font-medium ${
-                      isSubmitting ? 'bg-indigo-400' : 'bg-indigo-600 hover:bg-indigo-700'
-                    }`}
+                    className={`w-full py-3 px-4 rounded-lg text-white font-medium ${isSubmitting ? 'bg-indigo-400' : 'bg-indigo-600 hover:bg-indigo-700'
+                      }`}
                   >
                     {isSubmitting ? (
                       <span className="flex items-center justify-center">
@@ -336,11 +332,22 @@ const Cart = () => {
           <h1 className="text-4xl font-extrabold text-gray-900 mb-2">
             Your Shopping Cart
           </h1>
+
           <p className="text-lg text-gray-600">
-            {cartCount === 0 ? 
-              'Ready to start shopping?' : 
+            {cartCount === 0 ?
+              'Ready to start shopping?' :
               'Review your items before checkout'}
           </p>
+          <div>
+            <div style={{
+              width: 150,
+              textAlign: "center"
+            }}>
+              <center >
+                <Lottie animationData={animationData} loop={true} />
+              </center>
+            </div>
+          </div>
         </div>
 
         {cartCount === 0 ? (
@@ -367,9 +374,9 @@ const Cart = () => {
                   <div className="flex-shrink-0">
                     <div className="h-24 w-24 rounded-md bg-gray-200 overflow-hidden">
                       {item.image ? (
-                        <img 
-                          src={`http://localhost:8000/${item.image}`} 
-                          alt={item.title} 
+                        <img
+                          src={`http://localhost:8000/${item.image}`}
+                          alt={item.title}
                           className="h-full w-full object-cover"
                         />
                       ) : (
@@ -379,7 +386,7 @@ const Cart = () => {
                       )}
                     </div>
                   </div>
-                  
+
                   <div className="flex-grow">
                     <div className="flex justify-between items-start">
                       <div>
@@ -390,17 +397,17 @@ const Cart = () => {
                           </p>
                         )}
                       </div>
-                      <button 
+                      <button
                         onClick={() => handleRemoveItem(item.id)}
                         className="text-gray-400 hover:text-red-500"
                       >
                         <FiTrash2 size={18} />
                       </button>
                     </div>
-                    
+
                     <div className="mt-4 flex items-center justify-between">
                       <div className="flex items-center border rounded-md">
-                        <button 
+                        <button
                           onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}
                           className="px-3 py-1 text-gray-600 hover:bg-gray-100"
                           disabled={item.quantity <= 1}
@@ -408,14 +415,15 @@ const Cart = () => {
                           <FiMinus size={16} />
                         </button>
                         <span className="px-4 py-1 text-center w-12">{item.quantity}</span>
-                        <button 
+                        <button
                           onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}
                           className="px-3 py-1 text-gray-600 hover:bg-gray-100"
                         >
                           <FiPlus size={16} />
                         </button>
                       </div>
-                      
+
+
                       <p className="text-lg font-medium text-gray-900">
                         {(item.price * item.quantity).toFixed(2)} DH
                       </p>
@@ -424,7 +432,7 @@ const Cart = () => {
                 </div>
               ))}
             </div>
-            
+
             <div className="p-6 bg-gray-50 border-t border-gray-200">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-medium text-gray-900">
@@ -434,7 +442,7 @@ const Cart = () => {
                   {getCartTotal().toFixed(2)} DH
                 </p>
               </div>
-              <button 
+              <button
                 onClick={initiateOrder}
                 className="w-full bg-indigo-600 py-3 px-4 rounded-md text-white font-medium hover:bg-indigo-700 flex items-center justify-center"
               >

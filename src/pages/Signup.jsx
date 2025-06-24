@@ -96,7 +96,7 @@ export default function Register({ onRegisterSuccess }) {
     setApiError('');
     
     try {
-      const response = await axios.post('/api/register', formData);
+      const response = await axios.post('http://192.168.1.13:8000/api/register', formData);
       
       // Handle successful registration
       const { user, token } = response.data;

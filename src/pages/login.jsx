@@ -2,9 +2,12 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { FcGoogle } from "react-icons/fc";
 import fortisLogo from './admin/assets/FORTIS-01.svg';
-import backgroundVideo from '../backVideo.mp4'; // Import your video file
-const baseurl='http://localhost:8000'
+import backgroundVideo from '../backVideo.mp4';
+
+const baseurl = 'http://localhost:8000';
+
 const AuthForm = () => {
   const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
@@ -15,7 +18,8 @@ const AuthForm = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [isHovered, setIsHovered] = useState(false);
-const [phone,setphone]=useState(null)
+  const [phone, setPhone] = useState(null);
+
   useEffect(() => {
     setError("");
     setSuccess("");
@@ -29,16 +33,15 @@ const [phone,setphone]=useState(null)
 
     try {
       const endpoint = isLogin ? "login" : "register";
-      const payload = isLogin ? { email, password } : { name, email, password ,phone };
+      const payload = isLogin ? { email, password } : { name, email, password, phone };
 
       const res = await axios.post(`${baseurl}/api/${endpoint}`, payload);
 
       if (res?.data?.token) {
-        if(res.data.user.role==="admin"){
+        if (res.data.user.role === "admin") {
           sessionStorage.setItem("adminToken", res.data.token);
-               navigate("/admin/dashboard");
-        }
-        else{
+          navigate("/admin/dashboard");
+        } else {
           sessionStorage.setItem("UserToken", res.data.token);
           navigate('/')
         }
@@ -56,8 +59,13 @@ const [phone,setphone]=useState(null)
     }
   };
 
+  const handleGoogleLogin = () => {
+    // Redirect to your backend Google auth endpoint
+    window.location.href = `${baseurl}/api/auth/google`;
+  };
+
   return (
-    <div className="relative min-h-screen flex items-center justify-center p-4 overflow-hidden" >
+    <div className="relative min-h-screen flex items-center justify-center p-4 overflow-hidden">
       {/* Video Background */}
       <div className="absolute inset-0 z-0">
         <video 
@@ -70,27 +78,26 @@ const [phone,setphone]=useState(null)
           <source src={backgroundVideo} type="video/mp4" />
           Your browser does not support HTML5 video.
         </video>
-        <div className="absolute inset-0 bg-black/60"></div> {/* Dark overlay for better readability */}
+        <div className="absolute inset-0 bg-black/60"></div>
       </div>
 
       {/* Content Container */}
-      <div className="w-full max-w-4xl flex rounded-xl overflow-hidden shadow-2xl relative z-10" style={{marginTop:"4vh"}}>
+      <div className="w-full max-w-4xl flex rounded-xl overflow-hidden shadow-2xl relative z-10" style={{ marginTop: "4vh" }}>
         {/* Left Side - Branding Section */}
-        <div className="absolute inset-0 bg-black/30" style={{zIndex:"1"}}></div> {/* Dark overlay for better readability */}
+        <div className="absolute inset-0 bg-black/30" style={{ zIndex: "1" }}></div>
         <motion.div 
           className="hidden md:flex flex-col justify-center items-center p-8 w-1/2 relative bg-gradient-to-br from-blue-900/90 to-indigo-900/90"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
-          style={{backgroundImage:"url('/background.jpg')",backgroundSize:"cover",backgroundRepeat:""}}
-          
+          style={{ backgroundImage: "url('/background.jpg')", backgroundSize: "cover" }}
         >
           <motion.div
             initial={{ y: -20 }}
             animate={{ y: 0 }}
             transition={{ delay: 0.2 }}
             className="text-center"
-            style={{zIndex:"3"}}
+            style={{ zIndex: "3" }}
           >
             <h1 className="text-4xl font-bold mb-4 text-white">Admin Portal</h1>
             <p className="text-blue-100 mb-8 text-lg">
@@ -116,12 +123,9 @@ const [phone,setphone]=useState(null)
                 exit={{ opacity: 0, x: 20 }}
                 transition={{ duration: 0.3 }}
                 className="w-full h-full object-contain"
-                style={{zIndex:"3"}}
+                style={{ zIndex: "3" }}
               />
             </AnimatePresence>
-            
-
-            
           </motion.div>
         </motion.div>
 
@@ -131,7 +135,7 @@ const [phone,setphone]=useState(null)
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
           className="bg-white/95 backdrop-blur-sm p-10 w-full md:w-1/2"
-          style={{zIndex:"2"}}
+          style={{ zIndex: "2" }}
         >
           <div className="flex justify-between items-center mb-8">
             <div>
@@ -219,7 +223,7 @@ const [phone,setphone]=useState(null)
                     />
                     <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                        <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3v-1z" clipRule="evenodd" />
                       </svg>
                     </div>
                   </div>
@@ -233,22 +237,22 @@ const [phone,setphone]=useState(null)
                   transition={{ duration: 0.2 }}
                   className="space-y-1"
                 >
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                   phone number
+                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+                    Phone Number
                   </label>
                   <div className="relative">
                     <input
-                      id="name"
-                      type="text"
-                      placeholder="number"
+                      id="phone"
+                      type="tel"
+                      placeholder="+1234567890"
                       value={phone}
-                      onChange={(e) => setphone(e.target.value)}
+                      onChange={(e) => setPhone(e.target.value)}
                       className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition text-gray-700 placeholder-gray-400"
                       required
                     />
                     <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                        <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
                       </svg>
                     </div>
                   </div>
@@ -384,27 +388,16 @@ const [phone,setphone]=useState(null)
               </div>
             </div>
 
-            <div className="mt-6 grid grid-cols-2 gap-3">
+            <div className="mt-6">
               <motion.button
-                whileHover={{ y: -2 }}
+                whileHover={{ y: -2, backgroundColor: "#f8fafc" }}
                 whileTap={{ scale: 0.98 }}
                 type="button"
-                className="w-full inline-flex justify-center py-2 px-4 border border-gray-200 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+                onClick={handleGoogleLogin}
+                className="w-full inline-flex justify-center items-center py-3 px-4 border border-gray-200 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
               >
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                  <path fillRule="evenodd" d="M10 0C4.477 0 0 4.477 0 10c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.342-3.369-1.342-.454-1.155-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0110 4.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.933.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C17.14 18.163 20 14.418 20 10c0-5.523-4.477-10-10-10z" clipRule="evenodd" />
-                </svg>
-              </motion.button>
-
-              <motion.button
-                whileHover={{ y: -2 }}
-                whileTap={{ scale: 0.98 }}
-                type="button"
-                className="w-full inline-flex justify-center py-2 px-4 border border-gray-200 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
-              >
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                  <path d="M6.29 18.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0020 3.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.073 4.073 0 01.8 7.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 010 16.407a11.616 11.616 0 006.29 1.84" />
-                </svg>
+                <FcGoogle className="w-5 h-5 mr-2" />
+                Continue with Google
               </motion.button>
             </div>
           </div>
