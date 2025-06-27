@@ -30,6 +30,7 @@ import Wishlist from "../pages/WishListePage"
 import ResetPassword from "../pages/ResetPassword"
 import ForgotPassword from "../pages/ForgotPassword"
 import NewArrivals from "../pages/products/NewArrivals"
+import Accessories from "../pages/Accessories"
 export const router = createBrowserRouter([
   {
     element : <Layout/>,
@@ -85,6 +86,10 @@ export const router = createBrowserRouter([
         {
         path : '/products/casketat',
         element: <Casketat/>
+      },
+        {
+        path : '/products/accessories',
+        element: <Accessories/>
       },
      
       {
