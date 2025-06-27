@@ -1,15 +1,16 @@
 import { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import Lottie from "lottie-react";
 import animationData from './Animation - 1749846553631.json';
 import axios from 'axios';
-
+import Rating from '../RatingAnimation.json'
 // Constants
 const API_ENDPOINT = 'http://localhost:8000/api';
 const isArabic = document.documentElement.lang === 'ar';
+
 // Static categories configuration
 const STATIC_CATEGORIES = [
   {
@@ -23,17 +24,16 @@ const STATIC_CATEGORIES = [
     id: 2,
     name: "chapeau",
     image: "/clothes/caskette.jpeg",
-    link: "/products?category=chapeau",
+    link: "/products/casketat",
     label: "Casketat"
   },
   {
     id: 3,
     name: "accessories",
     image: "/clothes/accessories.jpg",
-    link: "/products?category=accessories",
+    link: "/products/accessories",
     label: "Accessories"
   }
-  // Add more categories as needed
 ];
 
 // Star Rating Component
@@ -47,14 +47,14 @@ const StarRating = ({ rating }) => {
       {[...Array(fullStars)].map((_, i) => (
         <svg
           key={`full-${i}`}
-          className="w-5 h-5 text-amber-400 "
+          className="w-5 h-5 text-amber-400"
           fill="currentColor"
           viewBox="0 0 20 20"
         >
           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
         </svg>
       ))}
-      
+
       {hasHalfStar && (
         <div className="relative w-5 h-5">
           <svg
@@ -74,7 +74,7 @@ const StarRating = ({ rating }) => {
           </svg>
         </div>
       )}
-      
+
       {[...Array(emptyStars)].map((_, i) => (
         <svg
           key={`empty-${i}`}
@@ -85,7 +85,7 @@ const StarRating = ({ rating }) => {
           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
         </svg>
       ))}
-      
+
       <span className="ml-2 text-sm text-yellow-400 font-bold">
         ({rating})
       </span>
@@ -117,19 +117,13 @@ const HomePage = () => {
         setLoading(true);
 
         // Fetch all data in parallel
-        const [slidesRes, productsRes] = await Promise.all([
+        const [slidesRes, topRatedRes] = await Promise.all([
           axios.get(`${API_ENDPOINT}/slides`),
-          axios.get(`${API_ENDPOINT}/products`)
+          axios.get(`${API_ENDPOINT}/top-rated-products`)
         ]);
 
         setSlides(slidesRes.data);
-        
-        // Get top rated products
-        const topRated = [...productsRes.data]
-          .sort((a, b) => (b.rating || 0) - (a.rating || 0))
-          .slice(0, 8);
-          
-        setTopRatedProducts(topRated);
+        setTopRatedProducts(topRatedRes.data || []);
 
       } catch (err) {
         console.error('Failed to fetch content:', err);
@@ -223,7 +217,6 @@ const HomePage = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Carousel */}
-      
       <CarouselSection
         slides={slides}
         currentSlide={currentSlide}
@@ -247,16 +240,16 @@ const HomePage = () => {
         t={t}
       />
 
-       {/* Newsletter */}
+      {/* Newsletter */}
       <NewsletterSection
         fontClasses={fontClasses}
         t={t}
       />
-<FreeDeliverySection
+
+      <FreeDeliverySection
         fontClasses={fontClasses}
         t={t}
       />
-     
 
       {/* Footer */}
       <FooterSection
@@ -267,7 +260,7 @@ const HomePage = () => {
   );
 };
 
-// Componentized sections (remain the same as in your original code)
+// Componentized sections
 const CarouselSection = ({ slides, currentSlide, setCurrentSlide, fontClasses, t }) => (
   <section className="relative h-screen pt-16 overflow-hidden">
     {slides.length > 0 ? (
@@ -332,14 +325,17 @@ const CarouselSection = ({ slides, currentSlide, setCurrentSlide, fontClasses, t
 
 const TopRatedProductsSection = ({ products, sliderRef, fontClasses, t }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [direction, setDirection] = useState(1); // 1 for forward, -1 for backward
   const productsPerPage = 4;
   const totalPages = Math.ceil(products.length / productsPerPage);
 
   const nextSlide = () => {
+    setDirection(1);
     setCurrentIndex(prev => (prev === totalPages - 1 ? 0 : prev + 1));
   };
 
   const prevSlide = () => {
+    setDirection(-1);
     setCurrentIndex(prev => (prev === 0 ? totalPages - 1 : prev - 1));
   };
 
@@ -358,16 +354,34 @@ const TopRatedProductsSection = ({ products, sliderRef, fontClasses, t }) => {
         <div className="absolute bottom-0 right-0 w-64 h-64 bg-amber-100 rounded-full opacity-10 blur-3xl"></div>
       </div>
 
-      <div className="container mx-auto px-4 sm:px-6 relative">
-        <div className="flex justify-between items-center mb-12">
-          <div>
-            <h2 className={`${fontClasses.heading} text-3xl md:text-4xl mb-2`}>
-              {t('home.topRatedProducts')}
-            </h2>
-            <div className="w-20 h-1 bg-gradient-to-r from-indigo-500 to-purple-600"></div>
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
+        <div className="flex justify-between items-center mb-12 px-4">
+          <div style={{ display: "flex" }}>
+            <div>
+              <div >
+                <h2 className={`${fontClasses.heading} text-3xl md:text-4xl mb-2`}>
+                  {t('home.topRatedProducts')}
+                </h2>
+
+              </div>
+
+              <div className="w-20 h-1 bg-gradient-to-r from-indigo-500 to-purple-600"></div>
+            </div>
+            <div>
+              <Lottie
+                animationData={Rating}
+                loop={true}
+                style={{
+                  width: "66vh",
+                  height: "27vh",
+                  position:"relative",
+                  bottom:"7vh"
+                }}
+              />
+            </div>
           </div>
-          <Link 
-            to="/products" 
+          <Link
+            to="/products"
             className={`${fontClasses.subheading} text-indigo-600 hover:text-indigo-800 flex items-center`}
           >
             {t('home.viewAll')}
@@ -376,96 +390,105 @@ const TopRatedProductsSection = ({ products, sliderRef, fontClasses, t }) => {
         </div>
 
         <div className="relative">
-          {/* Navigation Arrows - Show only on larger screens */}
-          <button 
+          {/* Navigation Arrows */}
+          <button
             onClick={prevSlide}
-            className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-16 z-20 w-14 h-14 items-center justify-center bg-white rounded-full shadow-xl hover:bg-gray-50 transition-all duration-300 hover:scale-110 focus:outline-none"
+            className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-12 z-20 w-12 h-12 items-center justify-center bg-white rounded-full shadow-xl hover:bg-gray-50 transition-all duration-300 hover:scale-110 focus:outline-none"
             aria-label={t('home.previousProducts')}
           >
-            <FiChevronLeft className="text-gray-700 text-2xl" />
+            <FiChevronLeft className="text-gray-700 text-xl" />
           </button>
-          
-          <button 
+
+          <button
             onClick={nextSlide}
-            className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-16 z-20 w-14 h-14 items-center justify-center bg-white rounded-full shadow-xl hover:bg-gray-50 transition-all duration-300 hover:scale-110 focus:outline-none"
+            className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-12 z-20 w-12 h-12 items-center justify-center bg-white rounded-full shadow-xl hover:bg-gray-50 transition-all duration-300 hover:scale-110 focus:outline-none"
             aria-label={t('home.nextProducts')}
           >
-            <FiChevronRight className="text-gray-700 text-2xl" />
+            <FiChevronRight className="text-gray-700 text-xl" />
           </button>
 
-          {/* Products Container - Updated grid classes */}
-          <div 
+          {/* Products Container */}
+          <div
             ref={sliderRef}
-            className="relative overflow-visible"
+            className="relative overflow-hidden"
           >
-            <motion.div
-              className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6"
-              key={currentIndex}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5 }}
-            >
-              {visibleProducts.map((product) => (
-                <motion.div
-                  key={product.id}
-                  whileHover={{ 
-                    y: -8,
-                    boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
-                  }}
-                  className="bg-white rounded-xl overflow-hidden shadow-lg transition-all duration-300 group"
-                >
-                  <div className="relative pb-[120%]">
-                    <img
-                      src={`http://localhost:8000/${product.image}`}
-                      alt={product.name}
-                      className="absolute h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      loading="lazy"
-                    />
-                    {product.discount && (
-                      <div className="absolute top-2 right-2 bg-gradient-to-r from-red-500 to-amber-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-md">
-                        -{product.discount}%
+            <AnimatePresence custom={direction} initial={false}>
+              <motion.div
+                key={currentIndex}
+                custom={direction}
+                initial={{ opacity: 0, x: direction > 0 ? 100 : -100 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: direction > 0 ? -100 : 100 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 300,
+                  damping: 30,
+                  duration: 0.5
+                }}
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 px-4"
+              >
+                {visibleProducts.map((product) => (
+                  <motion.div
+                    key={product.id}
+                    whileHover={{
+                      y: -8,
+                      boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
+                    }}
+                    className="bg-white rounded-xl overflow-hidden shadow-lg transition-all duration-300 group"
+                  >
+                    <div className="relative pb-[120%]">
+                      <img
+                        src={product.image.startsWith('http') ? product.image : `http://localhost:8000/${product.image}`}
+                        alt={product.name}
+                        className="absolute h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        loading="lazy"
+                      />
+                      {product.discount && (
+                        <div className="absolute top-2 right-2 bg-gradient-to-r from-red-500 to-amber-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-md">
+                          -{product.discount}%
+                        </div>
+                      )}
+
+                      {/* Rating Stars */}
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3">
+                        <StarRating rating={product.impressions_avg_rating || product.rating || 0} />
                       </div>
-                    )}
-
-                    {/* Rating Stars */}
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3">
-                      <StarRating rating={product.impressions_avg_rating || 0} />
                     </div>
-                  </div>
 
-                  <div className="p-4">
-                    <h3 className={`${fontClasses.subheading} text-sm sm:text-base mb-1 truncate`}>
-                      {product.name}
-                    </h3>
-                    <p className={`${fontClasses.body} text-gray-500 text-xs sm:text-sm mb-2`}>
-                      {product.category || t('home.featuredProduct')}
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <span className={`${fontClasses.heading} text-sm sm:text-base text-gray-900`}>
-                          ${product.price || '0.00'}
-                        </span>
-                        {product.originalPrice && (
-                          <span className={`${fontClasses.body} ml-1 text-gray-400 text-xs line-through`}>
-                            ${product.originalPrice}
+                    <div className="p-4">
+                      <h3 className={`${fontClasses.subheading} text-sm sm:text-base mb-1 truncate`}>
+                        {product.name}
+                      </h3>
+                      <p className={`${fontClasses.body} text-gray-500 text-xs sm:text-sm mb-2`}>
+                        {product.category || t('home.featuredProduct')}
+                      </p>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <span className={`${fontClasses.heading} text-sm sm:text-base text-gray-900`}>
+                            ${product.price || '0.00'}
                           </span>
-                        )}
+                          {product.originalPrice && (
+                            <span className={`${fontClasses.body} ml-1 text-gray-400 text-xs line-through`}>
+                              ${product.originalPrice}
+                            </span>
+                          )}
+                        </div>
+                        <Link
+                          to={`/AllProducts/product/${product.id}`}
+                          className={`${fontClasses.subheading} bg-indigo-600 hover:bg-indigo-700 text-white px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm transition-colors`}
+                        >
+                          {t('home.viewDetails')}
+                        </Link>
                       </div>
-                      <Link
-                        to={`/AllProducts/product/${product.id}`}
-                        className={`${fontClasses.subheading} bg-indigo-600 hover:bg-indigo-700 text-white px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm transition-colors`}
-                      >
-                        {t('home.viewDetails')}
-                      </Link>
                     </div>
-                  </div>
-                </motion.div>
-              ))}
-            </motion.div>
+                  </motion.div>
+                ))}
+              </motion.div>
+            </AnimatePresence>
           </div>
         </div>
 
-        {/* Mobile pagination dots - Show only on small screens */}
+        {/* Mobile pagination dots */}
         {totalPages > 1 && (
           <div className="md:hidden flex justify-center mt-8 space-x-2">
             {Array.from({ length: totalPages }).map((_, index) => (
@@ -558,15 +581,13 @@ const NewsletterSection = ({ fontClasses, t }) => (
         </div>
       </div>
     </div>
-    
   </section>
 );
-// Add this new component before the NewsletterSection in your HomePage component
+
 const FreeDeliverySection = ({ fontClasses, t }) => {
   const { i18n } = useTranslation();
   const isRTL = i18n.language === 'ar';
-  
-  // Text animation variants
+
   const textVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: {
@@ -592,27 +613,22 @@ const FreeDeliverySection = ({ fontClasses, t }) => {
 
   return (
     <section className="py-20 relative overflow-hidden h-[500px] md:h-[600px]">
-      {/* Background image with dark gradient fade */}
       <div className="absolute inset-0">
-        <img 
-          src="/laayoune.jpg" 
-          alt="Laayoune city" 
+        <img
+          src="/Laayoune2.jpg"
+          alt="Laayoune city"
           className="w-full h-full object-cover"
         />
-        {/* Dynamic gradient overlay based on language direction */}
-        <div 
-          className={`absolute inset-0 ${
-            isRTL 
-              ? 'bg-gradient-to-l from-black/80 via-black/50 to-transparent' 
+        <div
+          className={`absolute inset-0 ${isRTL
+              ? 'bg-gradient-to-l from-black/80 via-black/50 to-transparent'
               : 'bg-gradient-to-r from-black/80 via-black/50 to-transparent'
-          }`} 
+            }`}
         />
       </div>
 
-      {/* Content container */}
-      <div className={`container mx-auto px-6 relative z-10 h-full flex items-center ${
-        isRTL ? 'text-right' : 'text-left'
-      }`}>
+      <div className={`container mx-auto px-6 relative z-10 h-full flex items-center ${isRTL ? 'text-right' : 'text-left'
+        }`}>
         <motion.div
           className="max-w-2xl"
           initial="hidden"
@@ -620,23 +636,23 @@ const FreeDeliverySection = ({ fontClasses, t }) => {
           viewport={{ once: true, margin: "-100px" }}
           variants={textVariants}
         >
-          <motion.h2 
+          <motion.h2
             className={`${fontClasses.heading} text-3xl md:text-4xl mb-4 text-yellow-200`}
             variants={itemVariants}
           >
             {t("home.freeDelivery.title")}
           </motion.h2>
-          <motion.p 
+          <motion.p
             className={`${fontClasses.body} text-gray-200 mb-6`}
             variants={itemVariants}
           >
             {t("home.freeDelivery.description")}
           </motion.p>
-          <motion.div 
+          <motion.div
             className={`flex items-center ${isRTL ? 'flex-row-reverse' : ''}`}
             variants={itemVariants}
           >
-            <motion.span 
+            <motion.span
               className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-2 rounded-full text-sm font-medium mr-3 shadow-lg"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -644,7 +660,7 @@ const FreeDeliverySection = ({ fontClasses, t }) => {
             >
               {t("home.freeDelivery.badge")}
             </motion.span>
-            <motion.span 
+            <motion.span
               className={`${fontClasses.subheading} text-white`}
               whileHover={{ x: isRTL ? -5 : 5 }}
               transition={{ type: "spring", stiffness: 300 }}
@@ -654,16 +670,15 @@ const FreeDeliverySection = ({ fontClasses, t }) => {
           </motion.div>
         </motion.div>
 
-        {/* Lottie Animation - Position based on language */}
-        <motion.div 
+        <motion.div
           className={`absolute ${isRTL ? 'left-10' : 'right-10'} bottom-10 w-48 md:w-64`}
           initial={{ opacity: 0, scale: 0.8 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
         >
-          <Lottie 
-            animationData={animationData} 
+          <Lottie
+            animationData={animationData}
             loop={true}
           />
         </motion.div>
@@ -672,12 +687,9 @@ const FreeDeliverySection = ({ fontClasses, t }) => {
   );
 };
 
-
 const FooterSection = ({ fontClasses, t }) => (
   <footer className="bg-gray-900 text-white pt-20 pb-12">
-    <div className="absolute top-0 left-0 w-64 z-0">
-        <Lottie animationData={animationData} loop={true} />
-      </div>
+    <div className="absolute top-0 left-0 w-64 z-0"></div>
     <div className="container mx-auto px-6">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
         <div>

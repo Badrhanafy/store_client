@@ -7,10 +7,8 @@ import { useContext } from 'react';
 import { WishlistContext } from '../context/Wishlistecontext';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from "axios";
-
 import Lottie from "lottie-react";
 import NotFound from '../pages/Notfound.json';
-
 import { useTranslation } from 'react-i18next';
 import fortisLogo from '../pages/admin/assets/FORTIS-01.svg';
 
@@ -77,10 +75,6 @@ export default function Layout() {
     setSearchResults([]);
   };
 
-  const toggleLanguage = () => {
-    setIsLanguageOpen(!isLanguageOpen);
-  };
-
   const toggleUserPanel = () => {
     if (!token) {
       return;
@@ -136,13 +130,12 @@ export default function Layout() {
       (product.description && product.description.toLowerCase().includes(searchQuery.toLowerCase()))
     );
 
-    setSearchResults(results.slice(0, 8)); // Increased to 8 results for better grid display
+    setSearchResults(results.slice(0, 8));
   }, [searchQuery, products]);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     if (searchResults.length > 0) {
-      /*  navigate(`/product/${searchResults[0].id}`); */
       handleSearchClose();
     }
   };
@@ -204,18 +197,23 @@ export default function Layout() {
                   </button>
                 </div>
 
-                <div className="relative">
-                  <button
-                    onClick={toggleLanguage}
-                    className="flex items-center p-2 text-gray-600 hover:text-indigo-600 transition-colors"
+                <div className="relative group">
+                  <div
+                    className="flex items-center p-2 text-gray-600 hover:text-indigo-600 transition-colors cursor-pointer"
+                    onMouseEnter={() => setIsLanguageOpen(true)}
+                    onMouseLeave={() => setIsLanguageOpen(false)}
                   >
                     <FiGlobe size={20} className="mr-1" />
                     <span className="text-sm uppercase">{i18n.language}</span>
                     <FiChevronDown size={16} className="ml-1" />
-                  </button>
+                  </div>
 
                   {isLanguageOpen && (
-                    <div className="absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg z-50 border border-gray-100">
+                    <div 
+                      className="absolute right-0 mt-2 w-32 bg-white rounded-md shadow-lg z-50 border border-gray-100"
+                      onMouseEnter={() => setIsLanguageOpen(true)}
+                      onMouseLeave={() => setIsLanguageOpen(false)}
+                    >
                       <div className="py-1">
                         <button
                           onClick={() => changeLanguage('en')}
@@ -338,9 +336,8 @@ export default function Layout() {
                         type="text"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-
                         placeholder={t("Search products...")}
-                        className="w-full px-6 py-5 text-xl md:text-2xl text-yellow-200  animation-color duration-500 focus:text-white focus:ring-yellow-200 focus:bg-black/50  rounded-sm bg-yellow-500/10 shadow-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                        className="w-full px-6 py-5 text-xl md:text-2xl text-yellow-200 animation-color duration-500 focus:text-white focus:ring-yellow-200 focus:bg-black/50 rounded-sm bg-yellow-500/10 shadow-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
                         autoFocus
                       />
                       <button
@@ -406,7 +403,7 @@ export default function Layout() {
                         marginTop:"-11vh",
                         marginLeft:"34vh"
                       }}> 
-                                  <Lottie animationData={NotFound} loop={true} />
+                        <Lottie animationData={NotFound} loop={true} />
                       </div>
                     </motion.div>
                   )}

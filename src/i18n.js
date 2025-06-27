@@ -8,6 +8,8 @@ const resources = {
   en: {
     translation: {
       "Home": "Home",
+      "women":"women",
+      "men":"men",
       "Login": "Login",
       "Contact": "Contact",
       "Add product": "Add product",
@@ -76,6 +78,8 @@ const resources = {
       sign : "Please login to access your account and order history"
     },
      home: {
+      "viewAll":"view all",
+      "topRatedProducts":"topRatedProducts",
       "viewDetails":"viewDetails",
      "freeDelivery": {
       "title": "Free Delivery in Laayoune!",
@@ -186,6 +190,8 @@ const resources = {
   },
   fr: {
     translation: {
+      "women":"Feminin",
+      "men":"Masculin",
       "submitOrder":"lancer la commande",
       "Home": "Accueil",
       "Login": "Connexion",
@@ -255,6 +261,8 @@ const resources = {
       sign : "Veuillez vous connecter pour accéder à votre compte et à l’historique de vos commandes."
     },
     home: {
+      "topRatedProducts":"Les plus notées",
+      "viewAll":"Voir tous",
       "viewDetails":"Detailles",
     "freeDelivery": {
       "title": "Livraison gratuite à Laâyoune !",
@@ -361,6 +369,8 @@ const resources = {
   },
   ar: {
     translation: {
+      "women":"نساء",
+      "men":"رجال",
       "submitOrder":"ارسل الطلب",
       "Home": "الرئيسية",
       "Login": "تسجيل الدخول",
@@ -432,6 +442,8 @@ const resources = {
             sign : "يرجى تسجيل الدخول للوصول إلى حسابك وتاريخ الطلبات."
     },
      home: {
+      "topRatedProducts":"الأكثر تقييما",
+      "viewAll":"رؤية الكل",
       "viewDetails":"رؤية التفاصيل",
       "freeDelivery": {
       "title": "توصيل مجاني في العيون!",
