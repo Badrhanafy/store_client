@@ -41,7 +41,7 @@ export default function Layout() {
   useEffect(() => {
     if (token) {
       axios
-        .get(`${baseurl}/api/user`, {
+        .get(`${baseurl}/user`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -100,7 +100,7 @@ export default function Layout() {
   };
 
   useEffect(() => {
-    axios.get(`${baseurl}/api/products`).then(
+    axios.get(`${baseurl}/products`).then(
       res => setProducts(res.data))
   }, [id]);
 
