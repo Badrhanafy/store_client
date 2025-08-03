@@ -8,7 +8,7 @@ import animationData from './Animation - 1749846553631.json';
 import axios from 'axios';
 import Rating from '../RatingAnimation.json'
 // Constants
-const API_ENDPOINT = 'http://badrstore.42web.io/api';
+const API_ENDPOINT = 'https://badrstore.42web.io/api';
 const isArabic = document.documentElement.lang === 'ar';
 
 // Static categories configuration
