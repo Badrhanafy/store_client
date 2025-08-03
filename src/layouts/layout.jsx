@@ -20,7 +20,7 @@ export default function Layout() {
     body: "font-['Open_Sans']",
     nav: "font-['Raleway'] font-medium"
   };
-  const baseurl = 'http://localhost:8000';
+  const baseurl = 'https://badrstore.42web.io/api/';
   const { t, i18n } = useTranslation();
   const { cartCount } = useCart();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
