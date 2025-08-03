@@ -35,7 +35,9 @@ const AuthForm = () => {
       const endpoint = isLogin ? "login" : "register";
       const payload = isLogin ? { email, password } : { name, email, password, phone };
 
-      const res = await axios.post(`${baseurl}/api/${endpoint}`, payload);
+      const res = await axios.post(`${baseurl}/api/${endpoint}`, payload, {
+        withCredentials: true
+      });
 
       if (res?.data?.token) {
         if (res.data.user.role === "admin") {
@@ -52,7 +54,7 @@ const AuthForm = () => {
         setError("Authentication failed: no token returned");
       }
     } catch (err) {
-      setError(err.response?.data?.message || 
+      setError(err.response?.data?.message ||
         (isLogin ? "Login failed: check your credentials" : "Registration failed"));
     } finally {
       setIsLoading(false);
@@ -68,10 +70,10 @@ const AuthForm = () => {
     <div className="relative min-h-screen flex items-center justify-center p-4 overflow-hidden">
       {/* Video Background */}
       <div className="absolute inset-0 z-0">
-        <video 
-          autoPlay 
-          muted 
-          loop 
+        <video
+          autoPlay
+          muted
+          loop
           playsInline
           className="w-full h-full object-cover"
         >
@@ -85,7 +87,7 @@ const AuthForm = () => {
       <div className="w-full max-w-4xl flex rounded-xl overflow-hidden shadow-2xl relative z-10" style={{ marginTop: "4vh" }}>
         {/* Left Side - Branding Section */}
         <div className="absolute inset-0 bg-black/30" style={{ zIndex: "1" }}></div>
-        <motion.div 
+        <motion.div
           className="hidden md:flex flex-col justify-center items-center p-8 w-1/2 relative bg-gradient-to-br from-blue-900/90 to-indigo-900/90"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -104,7 +106,7 @@ const AuthForm = () => {
               {isLogin ? "Manage your platform with ease" : "Join our platform today"}
             </p>
           </motion.div>
-          
+
           <motion.div
             initial={{ scale: 0.9 }}
             animate={{ scale: 1 }}
@@ -146,7 +148,7 @@ const AuthForm = () => {
                 {isLogin ? "Access your dashboard" : "Get started in minutes"}
               </p>
             </div>
-            <motion.div 
+            <motion.div
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="bg-gray-100 rounded-lg p-1"
@@ -319,9 +321,9 @@ const AuthForm = () => {
                     Remember me
                   </label>
                 </div>
-                <motion.a 
+                <motion.a
                   whileHover={{ scale: 1.02 }}
-                  href="/forgot-password" 
+                  href="/forgot-password"
                   className="text-sm text-blue-500 hover:text-blue-600 font-medium"
                 >
                   Forgot password?

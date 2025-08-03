@@ -41,7 +41,7 @@ const Account = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await axios.get(`http://192.168.1.13:8000/api/users/${id}`);
+        const response = await axios.get(`http://localhost:8000/api/users/${id}`);
         setUser(response.data);
      /*    reset({
           name: response.data.name,

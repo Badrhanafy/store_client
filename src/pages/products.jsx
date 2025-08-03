@@ -121,7 +121,7 @@ const ProductCard = ({ product, onAddToCart, hoveredProduct, setHoveredProduct }
           </div>
           <div className="flex items-center">
             <FiStar className="text-yellow-400 fill-current" />
-            <span className={`${fontClasses.body} text-gray-600 ml-1 text-xs sm:text-base`}>{product.rating || '4.5'}</span>
+            <span className={`${fontClasses.body} text-gray-600 ml-1 text-xs sm:text-base`}>{product.impressions_avg_rating || '0.0'}</span>
           </div>
         </div>
 

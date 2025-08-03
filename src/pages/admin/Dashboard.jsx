@@ -8,7 +8,8 @@ import {
   FiType, FiPlusCircle, FiMoreHorizontal
 } from 'react-icons/fi';
 import axios from 'axios';
-
+import NotFound from '../Notfound.json'
+import Lottie from 'lottie-react';
 import toast, { Toaster } from 'react-hot-toast';
 import NotificationCenter from './Notificationscenter';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -124,7 +125,16 @@ const AdminDashboard = () => {
 
   // API base URL
   const API_URL = 'http://localhost:8000/api';
-
+/*   const  handleproductdelete = (id)  => {
+        try {
+             axios.delete(`${API_URL}/productDelete/${id}`).then(
+              alert('product deleted'),
+              setLoading(true)
+             )
+        } catch (error) {
+          alert('trouble with'+error)
+        }
+  } */
   // Configure axios
   axios.defaults.withCredentials = true;
 
@@ -1227,6 +1237,17 @@ const AdminDashboard = () => {
                   {filteredOrders.length === 0 && !loading && (
                     <div className="p-8 text-center text-gray-500">
                       {t('noOrdersFound')}
+                       <div className='text-center'>
+                            <center>
+
+                                  <Lottie animationData={NotFound} loop={true} 
+                              style={{
+                                width:"40vh",
+                                height:"20vh"
+                              }}
+                            />
+                            </center>
+                       </div>
                     </div>
                   )}
                 </div>
@@ -1679,7 +1700,9 @@ const AdminDashboard = () => {
                                       <FiEdit size={16} />
                                     </button>
 
-                                    <button className="text-red-600 hover:text-red-900">
+                                    <button className="text-red-600 hover:text-red-900"
+                                    
+                                    >
                                       <FiTrash2 size={16} />
                                     </button>
                                   </div>
